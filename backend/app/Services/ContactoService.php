@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Jobs\EnviarContactoAlCrm;
 use App\Mail\ContactoAvisoInternoMail;
 use App\Mail\ContactoConfirmacionMail;
 use App\Models\Contacto;
+use App\Support\ContactoCrm;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
@@ -13,9 +15,10 @@ use Illuminate\Support\Str;
 class ContactoService
 {
     /**
-     * Guarda la solicitud y encola los dos correos (confirmación + aviso interno).
-     * El envío va por cola: si el SMTP tarda o falla, la petición no espera y
-     * los correos se reintentan.
+     * Guarda la solicitud y encola los dos correos (confirmación + aviso interno)
+     * y, en los formularios por agente, su envío al CRM.
+     * Todo va por cola: si el SMTP o el CRM tardan o fallan, la petición no
+     * espera y los envíos se reintentan.
      */
     public function registrar(array $comunes, ?array $datos): Contacto
     {
@@ -27,6 +30,10 @@ class ContactoService
 
         if ($destino = config('contacto.avisos_a')) {
             Mail::to($destino)->queue(new ContactoAvisoInternoMail($contacto));
+        }
+
+        if (ContactoCrm::aplica($contacto)) {
+            EnviarContactoAlCrm::dispatch($contacto);
         }
 
         return $contacto;

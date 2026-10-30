@@ -12,6 +12,7 @@ class Contacto extends Model
     {
         return [
             'datos' => 'array',
+            'crm_enviado_at' => 'datetime',
         ];
     }
 }
