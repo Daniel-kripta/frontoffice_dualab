@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
+        // Confía en el proxy inverso (Caddy) del servidor para leer la IP real del visitante y el protocolo (https).
+        // La lista sale de TRUSTED_PROXIES (direcciones separadas por comas); sin ella no se confía en ningún proxy.
+        $middleware->trustProxies(at: array_filter(explode(',', (string) env('TRUSTED_PROXIES'))));
         $middleware->append(SecurityHeaders::class);
         $middleware->appendToGroup('api', [
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':120,1',
