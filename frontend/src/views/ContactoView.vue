@@ -238,6 +238,14 @@
                   </p>
                 </div>
 
+                <!-- Comunicaciones comerciales: casilla aparte, opcional y sin marcar. Enviar la solicitud no depende de ella -->
+                <label :for="`${t}-marketing`" class="flex items-start gap-2.5 mt-2.5 cursor-pointer">
+                  <input :id="`${t}-marketing`" v-model="persona.marketing" type="checkbox" class="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+                  <span class="text-[11px] text-gray-600 leading-snug">
+                    Quiero recibir novedades, contenidos y propuestas de DuaLab por correo electrónico. Puedes darte de baja cuando quieras. (Opcional)
+                  </span>
+                </label>
+
                 <p v-if="errorGeneral" class="text-sm text-red-600 mt-3" role="alert">{{ errorGeneral }}</p>
 
                 <!-- Acciones -->
@@ -272,6 +280,7 @@ import {
   CheckCircleIcon, LockClosedIcon, UserPlusIcon, ArrowRightIcon, InformationCircleIcon, PlayIcon,
 } from '@heroicons/vue/24/outline'
 import api, { ensureCsrfCookie } from '@/services/api'
+import { origenActual } from '@/services/origen'
 import ContactoHero from '@/components/contacto/ContactoHero.vue'
 import CtaTransforma from '@/components/common/CtaTransforma.vue'
 import ContactoStepper from '@/components/contacto/ContactoStepper.vue'
@@ -334,7 +343,7 @@ watch(() => route.query.tipo, (t) => { tipo.value = tipoValido(t) ?? 'centro' })
 // Separados por agente para no perder lo escrito al cambiar de pestaña.
 function estadoInicial() {
   return {
-    persona: { nombre: '', apellidos: '', cargo: '', email: '', telefono: '', comentarios: '' },
+    persona: { nombre: '', apellidos: '', cargo: '', email: '', telefono: '', comentarios: '', marketing: false },
     d: {
       centro: { centro_nombre: '', direccion: '', municipio: '', provincia: 'Santa Cruz de Tenerife', familias: [] },
       empresa: { empresa_nombre: '', cif: '', sector: '', provincia: 'Santa Cruz de Tenerife', municipio: '', direccion: '', tamano: '', colabora: '', intereses: [] },
@@ -409,6 +418,8 @@ async function enviar(e) {
     ...(tipo.value !== 'alumno' && { cargo: persona.cargo }),
     ...d[tipo.value],
     comentarios: persona.comentarios,
+    consentimiento_marketing: persona.marketing,
+    origen: origenActual(),
     website: honeypot.value,
   }
 

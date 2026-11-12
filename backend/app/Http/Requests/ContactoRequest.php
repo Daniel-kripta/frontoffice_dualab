@@ -36,6 +36,17 @@ class ContactoRequest extends FormRequest
             'telefono'  => ['required', 'string', 'max:20'],
             // Comentarios o peticiones libres, en todos los agentes (va a `datos`).
             'comentarios' => ['nullable', 'string', 'max:2000'],
+            // Casilla opcional de recibir novedades de DuaLab: sin marcar es un "no" y no impide enviar la solicitud.
+            'consentimiento_marketing' => ['nullable', 'boolean'],
+            // De dónde llegó la persona (ver origen.js del frontend); solo estas claves se aceptan.
+            'origen'              => ['nullable', 'array'],
+            'origen.utm_source'   => ['nullable', 'string', 'max:100'],
+            'origen.utm_medium'   => ['nullable', 'string', 'max:100'],
+            'origen.utm_campaign' => ['nullable', 'string', 'max:150'],
+            'origen.utm_content'  => ['nullable', 'string', 'max:150'],
+            'origen.utm_term'     => ['nullable', 'string', 'max:150'],
+            'origen.landing'      => ['nullable', 'string', 'max:255'],
+            'origen.referrer'     => ['nullable', 'string', 'max:255'],
         ]);
 
         return $rules + match ($this->input('tipo')) {
@@ -108,19 +119,33 @@ class ContactoRequest extends FormRequest
         ];
     }
 
+    /** Campos que van a columnas propias de `contactos` (el resto de lo validado acaba en `datos`). */
+    private const COLUMNAS = ['nombre', 'apellidos', 'email', 'tipo', 'accion', 'telefono', 'cargo'];
+
+    /** Campos que no son ni columnas de persona ni datos del agente: origen y consentimiento. */
+    private const SEGUIMIENTO = ['origen', 'consentimiento_marketing'];
+
     /** Campos comunes que van a columnas propias de `contactos`. */
     public function datosComunes(): array
     {
-        return collect($this->validated())
-            ->only(['nombre', 'apellidos', 'email', 'tipo', 'accion', 'telefono', 'cargo'])
-            ->all();
+        $validados = $this->validated();
+        $comunes = collect($validados)->only(self::COLUMNAS)->all();
+
+        // Origen: solo lo que haya traído el enlace (sin vacíos); si no trae nada, null.
+        $origen = array_filter($validados['origen'] ?? [], fn ($v) => is_string($v) && trim($v) !== '');
+        $comunes['origen'] = $origen ?: null;
+
+        // La fecha la pone el servidor al recibir la solicitud con la casilla marcada: es la constancia del consentimiento.
+        $comunes['marketing_consent_at'] = $this->boolean('consentimiento_marketing') ? now() : null;
+
+        return $comunes;
     }
 
     /** Campos propios del agente (ya validados por lista blanca) para la columna JSON `datos`. */
     public function datosEspecificos(): ?array
     {
         $especificos = collect($this->validated())
-            ->except(['nombre', 'apellidos', 'email', 'tipo', 'accion', 'telefono', 'cargo'])
+            ->except([...self::COLUMNAS, ...self::SEGUIMIENTO])
             ->all();
 
         return $especificos ?: null;

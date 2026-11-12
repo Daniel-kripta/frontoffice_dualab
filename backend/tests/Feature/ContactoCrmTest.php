@@ -60,6 +60,8 @@ class ContactoCrmTest extends TestCase
                     'need' => 'Queremos plantear un reto.', 'cif' => 'B12345678',
                     'sector' => 'Tecnología', 'companySize' => 'pequena', 'collaboratesWithCenters' => 'valorando',
                     'interests' => ['plantear_retos', 'casos_exito'],
+                    // Sin casilla marcada ni origen en el enlace: viaja "no" y nada más
+                    'marketingConsent' => false,
                 ];
         });
 
@@ -102,6 +104,63 @@ class ContactoCrmTest extends TestCase
             && $request['orgType'] === 'cabildo'
             && $request['territorialScope'] === 'insular'
             && ! isset($request['interests']));
+    }
+
+    public function test_el_origen_del_enlace_y_el_consentimiento_llegan_al_crm(): void
+    {
+        Http::fake([self::CRM.'/*' => Http::response('true')]);
+
+        $this->postJson('/api/contacto', $this->empresa('origen@empresa.test') + [
+            'consentimiento_marketing' => true,
+            'origen' => [
+                'utm_source' => 'linkedin', 'utm_medium' => 'cpc', 'utm_campaign' => 'lanzamiento-centros',
+                'utm_content' => '', 'landing' => '/centros', 'referrer' => 'https://www.linkedin.com/',
+            ],
+        ])->assertCreated();
+
+        $contacto = Contacto::sole();
+        $this->assertSame(['utm_source' => 'linkedin', 'utm_medium' => 'cpc', 'utm_campaign' => 'lanzamiento-centros',
+            'landing' => '/centros', 'referrer' => 'https://www.linkedin.com/'], $contacto->origen); // sin la clave vacía
+        $this->assertNotNull($contacto->marketing_consent_at);
+        $this->assertArrayNotHasKey('origen', $contacto->datos);
+        $this->assertArrayNotHasKey('consentimiento_marketing', $contacto->datos);
+
+        Http::assertSent(fn (Request $request) => $request['utmSource'] === 'linkedin'
+            && $request['utmMedium'] === 'cpc'
+            && $request['utmCampaign'] === 'lanzamiento-centros'
+            && $request['landingPage'] === '/centros'
+            && $request['referrerUrl'] === 'https://www.linkedin.com/'
+            && $request['marketingConsent'] === true
+            && preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $request['marketingConsentAt']) === 1
+            && ! isset($request['utmContent']));
+    }
+
+    public function test_sin_marcar_la_casilla_no_hay_consentimiento_aunque_venga_origen(): void
+    {
+        Http::fake([self::CRM.'/*' => Http::response('true')]);
+
+        $this->postJson('/api/contacto', $this->empresa('sin@empresa.test') + [
+            'consentimiento_marketing' => false, 'origen' => ['utm_source' => 'newsletter'],
+        ])->assertCreated();
+
+        $this->assertNull(Contacto::sole()->marketing_consent_at);
+        Http::assertSent(fn (Request $request) => $request['marketingConsent'] === false
+            && ! isset($request['marketingConsentAt']) && $request['utmSource'] === 'newsletter');
+    }
+
+    public function test_el_origen_solo_acepta_sus_claves_y_longitudes(): void
+    {
+        Http::fake();
+
+        $this->postJson('/api/contacto', $this->empresa('largo@empresa.test') + [
+            'origen' => ['utm_source' => str_repeat('a', 101)],
+        ])->assertUnprocessable()->assertJsonValidationErrors('origen.utm_source');
+
+        // Una clave que no está en la lista se descarta sin error
+        $this->postJson('/api/contacto', $this->empresa('extra@empresa.test') + [
+            'origen' => ['utm_source' => 'x', 'otra_cosa' => 'y'],
+        ])->assertCreated();
+        $this->assertSame(['utm_source' => 'x'], Contacto::sole()->origen);
     }
 
     public function test_con_la_integracion_apagada_no_se_envia_nada_pero_la_solicitud_se_guarda(): void

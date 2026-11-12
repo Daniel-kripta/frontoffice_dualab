@@ -42,6 +42,17 @@ final class ContactoCrm
         'intereses' => 'interests',
     ];
 
+    /** Clave de `origen` => campo del CRM (el CRM decide la procedencia a partir de ellos). */
+    private const ORIGEN = [
+        'utm_source' => 'utmSource',
+        'utm_medium' => 'utmMedium',
+        'utm_campaign' => 'utmCampaign',
+        'utm_content' => 'utmContent',
+        'utm_term' => 'utmTerm',
+        'landing' => 'landingPage',
+        'referrer' => 'referrerUrl',
+    ];
+
     /** Solo van al CRM los formularios por agente (con `accion`) de un tipo con ruta. */
     public static function aplica(Contacto $c): bool
     {
@@ -66,6 +77,13 @@ final class ContactoCrm
         foreach (self::CAMPOS as $origen => $destino) {
             $payload[$destino] = $datos[$origen] ?? null;
         }
+
+        // Origen (si el enlace lo traía) y consentimiento: sin marcar viaja `false`, la fecha solo si se marcó.
+        foreach (self::ORIGEN as $origen => $destino) {
+            $payload[$destino] = $c->origen[$origen] ?? null;
+        }
+        $payload['marketingConsent'] = $c->marketing_consent_at !== null;
+        $payload['marketingConsentAt'] = $c->marketing_consent_at?->utc()->format('Y-m-d H:i:s');
 
         // Sin vacíos: el CRM ignora lo que no llega, pero valida lo que llega.
         return array_filter($payload, fn ($valor) => $valor !== null && $valor !== '' && $valor !== []);
