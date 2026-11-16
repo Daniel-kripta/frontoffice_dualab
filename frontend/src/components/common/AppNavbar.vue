@@ -14,7 +14,7 @@
            margen propio para no quedar pegado al resto de enlaces del topbar -->
       <RouterLink :to="{ name: 'home' }" class="logo-animate group flex items-center gap-1 mr-3 shrink-0">
         <img
-          src="@/assets/logo_colores.png"
+          :src="apariencia.logo || logoOriginal"
           alt="Logo DuaLab"
           class="object-contain relative z-10 transition-all duration-300 group-hover:scale-105"
           :class="scrolled ? 'h-11' : 'h-14'"
@@ -64,6 +64,8 @@
             @click="link.action"
           >{{ link.label }}</button>
         </template>
+
+        <SelectorIdioma id="selector-idioma-escritorio" />
 
         <!-- Botones del diseño: Conéctate (login de la herramienta, otra SPA →
              enlace externo, nunca RouterLink) y Solicita tu demo (/contacto). -->
@@ -125,6 +127,7 @@
           </template>
 
           <div class="pt-4 space-y-3">
+            <SelectorIdioma id="selector-idioma-movil" />
             <a
               :href="`${toolUrl}/login`"
               class="flex items-center justify-center gap-2 w-full py-3.5 bg-white text-primary-700 border-2 border-primary-600 rounded-full font-black text-sm uppercase tracking-widest active:scale-95 transition-all duration-300"
@@ -145,6 +148,12 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import LogoLegend from '@/components/common/LogoLegend.vue'
+import SelectorIdioma from '@/components/common/SelectorIdioma.vue'
+import logoOriginal from '@/assets/logo_colores.png'
+import { useConfiguracionWeb } from '@/composables/useConfiguracionWeb'
+
+// Logo: el de Apariencia en el panel o el original
+const { apariencia } = useConfiguracionWeb()
 
 const scrolled  = ref(false)
 const menuOpen  = ref(false)

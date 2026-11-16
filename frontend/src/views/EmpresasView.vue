@@ -12,46 +12,49 @@
   <!-- HERO: mismo lenguaje que el de la home (azul de marca, foto de fondo
        tenue, rótulo en píldora y botones píldora blancos) -->
   <section class="relative overflow-hidden bg-primary-700 py-16 md:py-24 px-6">
-    <div class="absolute inset-0 bg-cover bg-center opacity-20" :style="{ backgroundImage: `url('${dua28}')` }" />
+    <div class="absolute inset-0 bg-cover bg-center opacity-20" :style="{ backgroundImage: `url('${p.imagen('hero.imagen_fondo', dua28)}')` }" />
 
     <div class="relative max-w-6xl mx-auto grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-12 items-center">
       <div>
         <span class="hero-badge inline-block bg-white/15 text-white px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-6 border border-white/30">
-          Empresas
+          {{ p.t('hero.antetitulo', 'Empresas') }}
         </span>
         <h1 class="hero-title text-[32px] sm:text-5xl md:text-6xl font-black tracking-tighter text-white leading-[1.1] mb-5">
-          Conecta tu empresa con el talento
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#8fc46a] to-administraciones">del futuro</span>
+          {{ p.t('hero.titulo', 'Conecta tu empresa con el talento') }}
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#8fc46a] to-administraciones">{{ p.t('hero.destacado', 'del futuro') }}</span>
         </h1>
-        <p class="hero-desc text-white/75 text-base leading-relaxed mb-8 max-w-lg">
+        <p v-if="p.tiene('hero.descripcion')" class="hero-desc text-white/75 text-base leading-relaxed mb-8 max-w-lg">{{ p.t('hero.descripcion') }}</p>
+        <!-- Sin editar en el panel: el original con sus resaltados -->
+        <p v-else class="hero-desc text-white/75 text-base leading-relaxed mb-8 max-w-lg">
           Colabora con <strong class="text-white font-bold">centros educativos</strong>, participa en la
           <strong class="text-[#8fc46a] font-bold">Formación Dual</strong> y convierte los
           <strong class="text-[#ffb066] font-bold">retos de tu empresa</strong> en
           <strong class="text-[#5fd0d0] font-bold">oportunidades de aprendizaje</strong>.
         </p>
         <div class="hero-btns flex flex-wrap gap-3">
-          <RouterLink :to="contactoEmpresa"
+          <EnlaceCms :to="heroB1.to"
                       class="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary-700 rounded-full font-black text-sm uppercase tracking-widest shadow-[0_8px_25px_rgba(0,0,0,0.2)] hover:shadow-[0_14px_35px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5 active:scale-95">
-            Registrar mi empresa
+            {{ heroB1.texto }}
             <ArrowRightIcon class="w-4 h-4 shrink-0" />
-          </RouterLink>
-          <RouterLink :to="contactoEmpresa"
+          </EnlaceCms>
+          <EnlaceCms :to="heroB2.to"
                       class="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white border-2 border-white/40 rounded-full font-black text-sm uppercase tracking-widest hover:bg-white/20 hover:border-white/70 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 backdrop-blur-sm">
-            Solicitar demo
-          </RouterLink>
+            {{ heroB2.texto }}
+          </EnlaceCms>
         </div>
       </div>
 
       <!-- Foto desde tablet (debajo del texto; al lado en escritorio). En móvil el hero queda compacto. La rotulación manuscrita, solo en escritorio -->
       <div class="hero-img relative hidden md:block">
-        <p class="hidden lg:block absolute -left-6 top-4 z-10 font-hand font-semibold text-white text-3xl leading-7 -rotate-12" aria-hidden="true">
+        <p v-if="p.tiene('hero.rotulo')" class="hidden lg:block absolute -left-6 top-4 z-10 font-hand font-semibold text-white text-3xl leading-7 -rotate-12 max-w-[11rem]" aria-hidden="true">{{ p.t('hero.rotulo') }}</p>
+        <p v-else class="hidden lg:block absolute -left-6 top-4 z-10 font-hand font-semibold text-white text-3xl leading-7 -rotate-12" aria-hidden="true">
           Talento real<br>para retos<br><span class="text-[#8fc46a]">reales</span>
         </p>
         <svg class="hidden lg:block absolute left-16 top-28 w-20 h-16 z-10" viewBox="0 0 100 80" fill="none" aria-hidden="true">
           <path d="M8 6 C 6 40, 40 64, 86 58" stroke="#FF8920" stroke-width="3" stroke-linecap="round" />
           <path d="M76 50 L88 58 L76 66" stroke="#FF8920" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        <img :src="dua9" alt="Profesionales de empresa colaborando con alumnado de FP"
+        <img :src="p.imagen('hero.imagen', dua9)" alt="Profesionales de empresa colaborando con alumnado de FP"
              class="blob-image w-full h-[340px] lg:h-[420px] object-cover" />
       </div>
     </div>
@@ -241,7 +244,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import dua6 from '@/assets/6_dua.jpg'
 import dua9 from '@/assets/dua_9.jpg'
@@ -267,6 +270,8 @@ import {
   PresentationChartBarIcon,
   UserGroupIcon,
 } from '@heroicons/vue/24/outline'
+import EnlaceCms from '@/components/common/EnlaceCms.vue'
+import { usePagina } from '@/composables/usePagina'
 
 // ── Directiva local: scroll-reveal (misma que en la home) ─────────────────────
 const vReveal = {
@@ -289,6 +294,11 @@ const vReveal = {
 const router = useRouter()
 // Todas las acciones de la página llevan al formulario con "Empresa" marcado
 const contactoEmpresa = { name: 'contacto', query: { tipo: 'empresa' } }
+
+// Textos de la cabecera editables desde el panel de gestión web (config/cms_paginas.php → empresas)
+const p = usePagina('empresas', { titulo: 'Empresas' })
+const heroB1 = computed(() => p.boton('hero.boton_principal', { texto: 'Registrar mi empresa', to: contactoEmpresa }))
+const heroB2 = computed(() => p.boton('hero.boton_secundario', { texto: 'Solicitar demo', to: contactoEmpresa }))
 
 const faqAbierta = ref(null)
 

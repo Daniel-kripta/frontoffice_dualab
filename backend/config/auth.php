@@ -93,10 +93,18 @@ return [
     */
 
     'passwords' => [
+        // ¿Olvidaste tu contraseña? del panel: como mucho 1 enlace por email cada 5 min
         'users' => [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
+            'throttle' => 300,
+        ],
+        // Invitación a una cuenta nueva del panel: el enlace dura 3 días
+        'invitaciones' => [
+            'provider' => 'users',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 4320,
             'throttle' => 60,
         ],
     ],

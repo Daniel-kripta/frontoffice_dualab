@@ -12,46 +12,49 @@
   <!-- HERO: mismo lenguaje que el de la home (azul de marca, foto de fondo
        tenue, rótulo en píldora y botones píldora blancos) -->
   <section class="relative overflow-hidden bg-primary-700 py-16 md:py-24 px-6">
-    <div class="absolute inset-0 bg-cover bg-center opacity-20" :style="{ backgroundImage: `url('${dua13}')` }" />
+    <div class="absolute inset-0 bg-cover bg-center opacity-20" :style="{ backgroundImage: `url('${p.imagen('hero.imagen_fondo', dua13)}')` }" />
 
     <div class="relative max-w-6xl mx-auto grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-12 items-center">
       <div>
         <span class="hero-badge inline-block bg-white/15 text-white px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-6 border border-white/30">
-          Centros educativos
+          {{ p.t('hero.antetitulo', 'Centros educativos') }}
         </span>
         <h1 class="hero-title text-[32px] sm:text-5xl md:text-6xl font-black tracking-tighter text-white leading-[1.1] mb-5">
-          La Formación Dual más conectada,
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-alumnos to-administraciones">simple y eficaz</span>
+          {{ p.t('hero.titulo', 'La Formación Dual más conectada,') }}
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-alumnos to-administraciones">{{ p.t('hero.destacado', 'simple y eficaz') }}</span>
         </h1>
-        <p class="hero-desc text-white/75 text-base leading-relaxed mb-8 max-w-lg">
+        <p v-if="p.tiene('hero.descripcion')" class="hero-desc text-white/75 text-base leading-relaxed mb-8 max-w-lg">{{ p.t('hero.descripcion') }}</p>
+        <!-- Sin editar en el panel: el original con sus resaltados -->
+        <p v-else class="hero-desc text-white/75 text-base leading-relaxed mb-8 max-w-lg">
           DuaLab es la plataforma que ayuda a tu centro a <strong class="text-white font-bold">gestionar la Formación Dual de forma integral</strong>,
           conectando <strong class="text-[#ffb066] font-bold">alumnado</strong>, <strong class="text-[#8fc46a] font-bold">empresas</strong>
           y tutoría, y facilitando el seguimiento, la comunicación y la
           <strong class="text-[#5fd0d0] font-bold">evaluación</strong> de todo el proceso.
         </p>
         <div class="hero-btns flex flex-wrap gap-3">
-          <RouterLink :to="contactoCentro"
+          <EnlaceCms :to="heroB1.to"
                       class="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary-700 rounded-full font-black text-sm uppercase tracking-widest shadow-[0_8px_25px_rgba(0,0,0,0.2)] hover:shadow-[0_14px_35px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5 active:scale-95">
-            Registrar mi centro
+            {{ heroB1.texto }}
             <ArrowRightIcon class="w-4 h-4 shrink-0" />
-          </RouterLink>
-          <RouterLink :to="contactoCentro"
+          </EnlaceCms>
+          <EnlaceCms :to="heroB2.to"
                       class="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white border-2 border-white/40 rounded-full font-black text-sm uppercase tracking-widest hover:bg-white/20 hover:border-white/70 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 backdrop-blur-sm">
-            Solicitar demo
-          </RouterLink>
+            {{ heroB2.texto }}
+          </EnlaceCms>
         </div>
       </div>
 
       <!-- Foto desde tablet (debajo del texto; al lado en escritorio). En móvil el hero queda compacto. La rotulación manuscrita, solo en escritorio -->
       <div class="hero-img relative hidden md:block">
-        <p class="hidden lg:block absolute -left-6 top-4 z-10 font-hand font-semibold text-white text-3xl leading-7 -rotate-12" aria-hidden="true">
+        <p v-if="p.tiene('hero.rotulo')" class="hidden lg:block absolute -left-6 top-4 z-10 font-hand font-semibold text-white text-3xl leading-7 -rotate-12 max-w-[11rem]" aria-hidden="true">{{ p.t('hero.rotulo') }}</p>
+        <p v-else class="hidden lg:block absolute -left-6 top-4 z-10 font-hand font-semibold text-white text-3xl leading-7 -rotate-12" aria-hidden="true">
           Conectando<br>talento con<br><span class="text-alumnos">oportunidades</span><br>reales
         </p>
         <svg class="hidden lg:block absolute left-16 top-36 w-20 h-16 z-10" viewBox="0 0 100 80" fill="none" aria-hidden="true">
           <path d="M8 6 C 6 40, 40 64, 86 58" stroke="#FF8920" stroke-width="3" stroke-linecap="round" />
           <path d="M76 50 L88 58 L76 66" stroke="#FF8920" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        <img :src="dua17" alt="Alumnado trabajando en un reto en el aula"
+        <img :src="p.imagen('hero.imagen', dua17)" alt="Alumnado trabajando en un reto en el aula"
              class="blob-image w-full h-[340px] lg:h-[420px] object-cover" />
       </div>
     </div>
@@ -257,7 +260,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import dua11 from '@/assets/dua_11.jpeg'
 import dua13 from '@/assets/dua_13.jpg'
@@ -284,6 +287,8 @@ import {
   UserGroupIcon,
   BookOpenIcon,
 } from '@heroicons/vue/24/outline'
+import EnlaceCms from '@/components/common/EnlaceCms.vue'
+import { usePagina } from '@/composables/usePagina'
 
 // ── Directiva local: scroll-reveal (misma que en la home) ─────────────────────
 const vReveal = {
@@ -306,6 +311,11 @@ const vReveal = {
 const router = useRouter()
 // Todas las acciones de la página llevan al formulario con "Centro educativo" marcado
 const contactoCentro = { name: 'contacto', query: { tipo: 'centro' } }
+
+// Textos de la cabecera editables desde el panel de gestión web (config/cms_paginas.php → centros)
+const p = usePagina('centros', { titulo: 'Centros Educativos' })
+const heroB1 = computed(() => p.boton('hero.boton_principal', { texto: 'Registrar mi centro', to: contactoCentro }))
+const heroB2 = computed(() => p.boton('hero.boton_secundario', { texto: 'Solicitar demo', to: contactoCentro }))
 
 const faqAbierta = ref(null)
 

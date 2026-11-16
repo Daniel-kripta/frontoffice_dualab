@@ -42,6 +42,7 @@
 <script setup>
 import { reactive, ref, watch } from 'vue'
 import api, { ensureCsrfCookie } from '@/services/api'
+import { paginaOrigen } from '@/utils/paginaOrigen'
 
 // Tipo preseleccionado desde fuera (p. ej. botón "Inscribe tu centro" de la
 // home). Solo rellena el select: el usuario puede cambiarlo antes de enviar.
@@ -59,7 +60,8 @@ async function submit() {
   errorGeneral.value = ''
   try {
     await ensureCsrfCookie()
-    await api.post('/contacto', form)
+    // Página de la web desde la que se envía: la bandeja del panel los clasifica por ella
+    await api.post('/contacto', { ...form, pagina_origen: paginaOrigen() })
     success.value = true
     Object.assign(form, { nombre: '', email: '', tipo: '', telefono: '' })
   } catch (error) {

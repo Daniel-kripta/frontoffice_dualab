@@ -6,7 +6,7 @@
       <div>
         <RouterLink :to="{ name: 'home' }" class="inline-flex items-center gap-1 group">
           <img
-            src="@/assets/logo_colores.png"
+            :src="apariencia.logo || logoOriginal"
             alt="Logo DuaLab"
             class="h-14 object-contain transition-transform duration-300 group-hover:scale-105"
           />
@@ -74,6 +74,11 @@
 <script setup>
 import { PhoneIcon, EnvelopeIcon, MapPinIcon } from '@heroicons/vue/24/outline'
 import LogoLegend from '@/components/common/LogoLegend.vue'
+import logoOriginal from '@/assets/logo_colores.png'
+import { useConfiguracionWeb } from '@/composables/useConfiguracionWeb'
+
+// Logo: el de Apariencia en el panel o el original
+const { apariencia } = useConfiguracionWeb()
 
 const year = new Date().getFullYear()
 

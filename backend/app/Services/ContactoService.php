@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Jobs\EnviarContactoAlCrm;
+use App\Jobs\EnviarFormularioAWebhook;
 use App\Mail\ContactoAvisoInternoMail;
 use App\Mail\ContactoConfirmacionMail;
+use App\Models\Ajuste;
 use App\Models\Contacto;
 use App\Support\ContactoCrm;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
@@ -34,6 +36,11 @@ class ContactoService
 
         if (ContactoCrm::aplica($contacto)) {
             EnviarContactoAlCrm::dispatch($contacto);
+        }
+
+        // Integraciones (CRM / mail marketing) configuradas en el panel de gestión web.
+        if (Ajuste::leer('integraciones.webhook_activo')) {
+            EnviarFormularioAWebhook::dispatch($contacto);
         }
 
         return $contacto;

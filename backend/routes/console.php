@@ -17,3 +17,6 @@ Schedule::command('queue:prune-failed --hours=48')->daily();
 Schedule::command('queue:work --stop-when-empty --tries=3 --max-time=50')
     ->everyMinute()
     ->withoutOverlapping();
+
+// Registro de actividad del panel de gestión web: se guarda 2 años (ActividadPanel::prunable)
+Schedule::command('model:prune', ['--model' => [\App\Models\ActividadPanel::class]])->daily();

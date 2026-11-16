@@ -1,0 +1,1092 @@
+{
+ "grupos": {
+  "sin-remates": "Sin remates · modernas, de trazo limpio",
+  "redondeadas": "Redondeadas · cercanas, de puntas suaves",
+  "con-remates": "Con remates · clásicas, como de libro",
+  "cartel": "De cartel · llamativas, solo para títulos"
+ },
+ "fuentes": [
+  {
+   "id": "inter",
+   "familia": "Inter",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "opensans",
+   "familia": "Open Sans",
+   "grupo": "sin-remates",
+   "pesos": [
+    300,
+    400,
+    500,
+    600,
+    700,
+    800
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "lato",
+   "familia": "Lato",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    300,
+    400,
+    700,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "sourcesans",
+   "familia": "Source Sans 3",
+   "grupo": "sin-remates",
+   "pesos": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "roboto",
+   "familia": "Roboto",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "nunitosans",
+   "familia": "Nunito Sans",
+   "grupo": "sin-remates",
+   "pesos": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "worksans",
+   "familia": "Work Sans",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "dmsans",
+   "familia": "DM Sans",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "manrope",
+   "familia": "Manrope",
+   "grupo": "sin-remates",
+   "pesos": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "notosans",
+   "familia": "Noto Sans",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "lexend",
+   "familia": "Lexend",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "poppins",
+   "familia": "Poppins",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "montserrat",
+   "familia": "Montserrat",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "raleway",
+   "familia": "Raleway",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "outfit",
+   "familia": "Outfit",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "sora",
+   "familia": "Sora",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "plusjakarta",
+   "familia": "Plus Jakarta Sans",
+   "grupo": "sin-remates",
+   "pesos": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "figtree",
+   "familia": "Figtree",
+   "grupo": "sin-remates",
+   "pesos": [
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "rubik",
+   "familia": "Rubik",
+   "grupo": "sin-remates",
+   "pesos": [
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "mulish",
+   "familia": "Mulish",
+   "grupo": "sin-remates",
+   "pesos": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "karla",
+   "familia": "Karla",
+   "grupo": "sin-remates",
+   "pesos": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "ibmplexsans",
+   "familia": "IBM Plex Sans",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "barlow",
+   "familia": "Barlow",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "archivo",
+   "familia": "Archivo",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "publicsans",
+   "familia": "Public Sans",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "redhatdisplay",
+   "familia": "Red Hat Display",
+   "grupo": "sin-remates",
+   "pesos": [
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "urbanist",
+   "familia": "Urbanist",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "albertsans",
+   "familia": "Albert Sans",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "bevietnampro",
+   "familia": "Be Vietnam Pro",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "librefranklin",
+   "familia": "Libre Franklin",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "hankengrotesk",
+   "familia": "Hanken Grotesk",
+   "grupo": "sin-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "nunito",
+   "familia": "Nunito",
+   "grupo": "redondeadas",
+   "pesos": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "quicksand",
+   "familia": "Quicksand",
+   "grupo": "redondeadas",
+   "pesos": [
+    300,
+    400,
+    500,
+    600,
+    700
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "comfortaa",
+   "familia": "Comfortaa",
+   "grupo": "redondeadas",
+   "pesos": [
+    300,
+    400,
+    500,
+    600,
+    700
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "fredoka",
+   "familia": "Fredoka",
+   "grupo": "redondeadas",
+   "pesos": [
+    300,
+    400,
+    500,
+    600,
+    700
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "mplusrounded",
+   "familia": "M PLUS Rounded 1c",
+   "grupo": "redondeadas",
+   "pesos": [
+    100,
+    300,
+    400,
+    500,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "merriweather",
+   "familia": "Merriweather",
+   "grupo": "con-remates",
+   "pesos": [
+    300,
+    400,
+    700,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "playfair",
+   "familia": "Playfair Display",
+   "grupo": "con-remates",
+   "pesos": [
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "lora",
+   "familia": "Lora",
+   "grupo": "con-remates",
+   "pesos": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "sourceserif",
+   "familia": "Source Serif 4",
+   "grupo": "con-remates",
+   "pesos": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "librebaskerville",
+   "familia": "Libre Baskerville",
+   "grupo": "con-remates",
+   "pesos": [
+    400,
+    700
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "crimsonpro",
+   "familia": "Crimson Pro",
+   "grupo": "con-remates",
+   "pesos": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "ptserif",
+   "familia": "PT Serif",
+   "grupo": "con-remates",
+   "pesos": [
+    400,
+    700
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "notoserif",
+   "familia": "Noto Serif",
+   "grupo": "con-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "cormorant",
+   "familia": "Cormorant Garamond",
+   "grupo": "con-remates",
+   "pesos": [
+    300,
+    400,
+    500,
+    600,
+    700
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "ebgaramond",
+   "familia": "EB Garamond",
+   "grupo": "con-remates",
+   "pesos": [
+    400,
+    500,
+    600,
+    700,
+    800
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "fraunces",
+   "familia": "Fraunces",
+   "grupo": "con-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "bitter",
+   "familia": "Bitter",
+   "grupo": "con-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "robotoslab",
+   "familia": "Roboto Slab",
+   "grupo": "con-remates",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "zillaslab",
+   "familia": "Zilla Slab",
+   "grupo": "con-remates",
+   "pesos": [
+    300,
+    400,
+    500,
+    600,
+    700
+   ],
+   "usos": [
+    "titulos",
+    "texto"
+   ]
+  },
+  {
+   "id": "arvo",
+   "familia": "Arvo",
+   "grupo": "con-remates",
+   "pesos": [
+    400,
+    700
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "oswald",
+   "familia": "Oswald",
+   "grupo": "cartel",
+   "pesos": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "barlowcondensed",
+   "familia": "Barlow Condensed",
+   "grupo": "cartel",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "leaguespartan",
+   "familia": "League Spartan",
+   "grupo": "cartel",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "unbounded",
+   "familia": "Unbounded",
+   "grupo": "cartel",
+   "pesos": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "bricolage",
+   "familia": "Bricolage Grotesque",
+   "grupo": "cartel",
+   "pesos": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "spacegrotesk",
+   "familia": "Space Grotesk",
+   "grupo": "cartel",
+   "pesos": [
+    300,
+    400,
+    500,
+    600,
+    700
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "syne",
+   "familia": "Syne",
+   "grupo": "cartel",
+   "pesos": [
+    400,
+    500,
+    600,
+    700,
+    800
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "bigshoulders",
+   "familia": "Big Shoulders Display",
+   "grupo": "cartel",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos"
+   ]
+  },
+  {
+   "id": "sairacondensed",
+   "familia": "Saira Condensed",
+   "grupo": "cartel",
+   "pesos": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "usos": [
+    "titulos"
+   ]
+  }
+ ]
+}

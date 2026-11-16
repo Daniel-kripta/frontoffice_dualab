@@ -12,18 +12,20 @@
   <!-- HERO: mismo lenguaje que el de la home (azul de marca, foto de fondo
        tenue, rótulo en píldora y botones píldora blancos) -->
   <section class="relative overflow-hidden bg-primary-700 py-16 md:py-24 px-6">
-    <div class="absolute inset-0 bg-cover bg-center opacity-20" :style="{ backgroundImage: `url('${dua27}')` }" />
+    <div class="absolute inset-0 bg-cover bg-center opacity-20" :style="{ backgroundImage: `url('${p.imagen('hero.imagen_fondo', dua27)}')` }" />
 
     <div class="relative max-w-6xl mx-auto grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-12 items-center">
       <div>
         <span class="hero-badge inline-block bg-white/15 text-white px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-6 border border-white/30">
-          Alumnado
+          {{ p.t('hero.antetitulo', 'Alumnado') }}
         </span>
         <h1 class="hero-title text-[32px] sm:text-5xl md:text-6xl font-black tracking-tighter text-white leading-[1.1] mb-5">
-          Tu talento, conectado con
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ffb066] to-alumnos">tu futuro</span>
+          {{ p.t('hero.titulo', 'Tu talento, conectado con') }}
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ffb066] to-alumnos">{{ p.t('hero.destacado', 'tu futuro') }}</span>
         </h1>
-        <p class="hero-desc text-white/75 text-base leading-relaxed mb-8 max-w-lg">
+        <p v-if="p.tiene('hero.descripcion')" class="hero-desc text-white/75 text-base leading-relaxed mb-8 max-w-lg">{{ p.t('hero.descripcion') }}</p>
+        <!-- Sin editar en el panel: el original con sus resaltados -->
+        <p v-else class="hero-desc text-white/75 text-base leading-relaxed mb-8 max-w-lg">
           Aprende con <strong class="text-[#ffb066] font-bold">retos reales</strong>, conecta con el
           <strong class="text-[#8fc46a] font-bold">mundo profesional</strong> y sigue tu
           <strong class="text-[#5fd0d0] font-bold">Formación Dual</strong> en un mismo lugar.
@@ -31,21 +33,22 @@
         <!-- El registro de alumnado aún no está abierto (contactoConfig.js: alumno bloqueado):
              la acción principal lleva a explorar los retos publicados. -->
         <div class="hero-btns flex flex-wrap gap-3">
-          <RouterLink :to="{ name: 'familias' }"
+          <EnlaceCms :to="heroB1.to"
                       class="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary-700 rounded-full font-black text-sm uppercase tracking-widest shadow-[0_8px_25px_rgba(0,0,0,0.2)] hover:shadow-[0_14px_35px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5 active:scale-95">
-            Explorar retos
+            {{ heroB1.texto }}
             <ArrowRightIcon class="w-4 h-4 shrink-0" />
-          </RouterLink>
-          <RouterLink :to="contacto"
+          </EnlaceCms>
+          <EnlaceCms :to="heroB2.to"
                       class="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white border-2 border-white/40 rounded-full font-black text-sm uppercase tracking-widest hover:bg-white/20 hover:border-white/70 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 backdrop-blur-sm">
-            Solicitar información
-          </RouterLink>
+            {{ heroB2.texto }}
+          </EnlaceCms>
         </div>
       </div>
 
       <!-- Foto desde tablet (debajo del texto; al lado en escritorio). En móvil el hero queda compacto. La rotulación manuscrita, solo en escritorio -->
       <div class="hero-img relative hidden md:block">
-        <p class="hidden lg:block absolute -left-6 top-4 z-10 font-hand font-semibold text-white text-3xl leading-7 -rotate-12" aria-hidden="true">
+        <p v-if="p.tiene('hero.rotulo')" class="hidden lg:block absolute -left-6 top-4 z-10 font-hand font-semibold text-white text-3xl leading-7 -rotate-12 max-w-[11rem]" aria-hidden="true">{{ p.t('hero.rotulo') }}</p>
+        <p v-else class="hidden lg:block absolute -left-6 top-4 z-10 font-hand font-semibold text-white text-3xl leading-7 -rotate-12" aria-hidden="true">
           Aprende,<br>conecta<br><span class="text-alumnos">y crece</span>
         </p>
         <svg class="hidden lg:block absolute left-16 top-28 w-20 h-16 z-10" viewBox="0 0 100 80" fill="none" aria-hidden="true">
@@ -54,7 +57,7 @@
         </svg>
         <!-- Recorte en el contenedor para que el degradado siga la misma forma que la foto -->
         <div class="blob-image relative h-[340px] lg:h-[420px]">
-          <img :src="dua12" alt="Alumnado resolviendo un reto en el aula"
+          <img :src="p.imagen('hero.imagen', dua12)" alt="Alumnado resolviendo un reto en el aula"
                class="w-full h-full object-cover" />
           <!-- Degradado y desenfoque en la parte inferior: la hoja de la mesa no debe poder leerse -->
           <div class="absolute inset-x-0 bottom-0 h-1/2 backdrop-blur-[2px] bg-gradient-to-t from-primary-700/40 via-primary-700/15 to-transparent fade-mask" aria-hidden="true" />
@@ -247,7 +250,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import dua8 from '@/assets/8_dua.jpg'
 import dua12 from '@/assets/dua_12.jpeg'
@@ -272,6 +275,8 @@ import {
   UserCircleIcon,
   UserGroupIcon,
 } from '@heroicons/vue/24/outline'
+import EnlaceCms from '@/components/common/EnlaceCms.vue'
+import { usePagina } from '@/composables/usePagina'
 
 // ── Directiva local: scroll-reveal (misma que en la home) ─────────────────────
 const vReveal = {
@@ -295,6 +300,11 @@ const router = useRouter()
 // El formulario de alumnado aún está bloqueado (contactoConfig.js): las
 // acciones de contacto llevan al formulario general.
 const contacto = { name: 'contacto' }
+
+// Textos de la cabecera editables desde el panel de gestión web (config/cms_paginas.php → alumnado)
+const p = usePagina('alumnado', { titulo: 'Alumnado' })
+const heroB1 = computed(() => p.boton('hero.boton_principal', { texto: 'Explorar retos', to: { name: 'familias' } }))
+const heroB2 = computed(() => p.boton('hero.boton_secundario', { texto: 'Solicitar información', to: contacto }))
 
 const faqAbierta = ref(null)
 

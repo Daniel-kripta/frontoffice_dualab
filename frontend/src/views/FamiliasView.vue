@@ -1,7 +1,7 @@
 <template>
   <section class="bg-primary-700 py-16 px-6 relative overflow-hidden">
     <div class="absolute inset-0 bg-cover bg-center opacity-10"
-         style="background-image: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&q=60')" />
+         :style="{ backgroundImage: `url('${p.imagen('hero.imagen_fondo', 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&q=60')}')` }" />
     <div class="relative max-w-5xl mx-auto">
       <RouterLink :to="{ name: 'home' }"
                   class="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm mb-6 transition-colors">
@@ -9,11 +9,11 @@
         Volver al inicio
       </RouterLink>
       <span class="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4 tracking-wider">
-        PLATAFORMA
+        {{ p.t('hero.antetitulo', 'PLATAFORMA') }}
       </span>
-      <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-3">Familias Profesionales</h1>
+      <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-3">{{ p.t('hero.titulo', 'Familias Profesionales') }}</h1>
       <p class="text-white/75 text-base max-w-xl">
-        Retos reales de empresas, organizados por área de conocimiento.
+        {{ p.t('hero.subtitulo', 'Retos reales de empresas, organizados por área de conocimiento.') }}
       </p>
     </div>
   </section>
@@ -66,6 +66,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
 import FamiliaCard from '@/components/home/FamiliaCard.vue'
 import { familiasProximamente } from '@/data/familias'
 import { familiaIcon } from '@/data/familiaIcons'
+import { usePagina } from '@/composables/usePagina'
 
 const familias = ref([])
 const loading  = ref(true)
@@ -83,4 +84,7 @@ onMounted(async () => {
   }
 })
 
+
+// Cabecera editable desde el panel de gestión web (config/cms_paginas.php → familias)
+const p = usePagina('familias', { titulo: 'Familias Profesionales' })
 </script>

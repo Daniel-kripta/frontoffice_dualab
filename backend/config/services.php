@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    // Biblioteca de medios del panel de gestión web (misma cuenta que la app DuaLab,
+    // otra carpeta). Sin estas variables, los archivos se guardan en el disco local.
+    'cloudinary' => [
+        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+        'api_key'    => env('CLOUDINARY_API_KEY'),
+        'api_secret' => env('CLOUDINARY_API_SECRET'),
+        'folder'     => env('CLOUDINARY_FOLDER', 'dualab/web'),
+    ],
+
 ];

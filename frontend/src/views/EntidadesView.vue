@@ -13,47 +13,50 @@
   <!-- HERO: mismo lenguaje que el de la home (azul de marca, foto de fondo
        tenue, rótulo en píldora y botones píldora blancos) -->
   <section class="relative overflow-hidden bg-primary-700 py-16 md:py-24 px-6">
-    <div class="absolute inset-0 bg-cover bg-center opacity-20" :style="{ backgroundImage: `url('${dua4}')` }" />
+    <div class="absolute inset-0 bg-cover bg-center opacity-20" :style="{ backgroundImage: `url('${p.imagen('hero.imagen_fondo', dua4)}')` }" />
 
     <div class="relative max-w-6xl mx-auto grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-12 items-center">
       <div>
         <span class="hero-badge inline-block bg-white/15 text-white px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-6 border border-white/30">
-          Instituciones y administraciones
+          {{ p.t('hero.antetitulo', 'Instituciones y administraciones') }}
         </span>
         <!-- "Administraciones" es una palabra muy larga: el tamaño baja en lg (columna estrecha) y en móvil -->
         <h1 class="hero-title text-[28px] sm:text-5xl md:text-6xl lg:text-5xl font-black tracking-tighter text-white leading-[1.1] mb-5">
-          Impulsamos la Formación Dual desde
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#5fd0d0] to-[#8fc46a]">las Administraciones</span>
+          {{ p.t('hero.titulo', 'Impulsamos la Formación Dual desde') }}
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#5fd0d0] to-[#8fc46a]">{{ p.t('hero.destacado', 'las Administraciones') }}</span>
         </h1>
-        <p class="hero-desc text-white/75 text-base leading-relaxed mb-8 max-w-lg">
+        <p v-if="p.tiene('hero.descripcion')" class="hero-desc text-white/75 text-base leading-relaxed mb-8 max-w-lg">{{ p.t('hero.descripcion') }}</p>
+        <!-- Sin editar en el panel: el original con sus resaltados -->
+        <p v-else class="hero-desc text-white/75 text-base leading-relaxed mb-8 max-w-lg">
           DuaLab es la plataforma que conecta <strong class="text-white font-bold">centros</strong>,
           <strong class="text-[#8fc46a] font-bold">empresas</strong> y <strong class="text-[#ffb066] font-bold">alumnado</strong>,
           facilitando la planificación, gestión, seguimiento y evaluación de los programas de Formación Profesional Dual
           de forma eficiente, transparente y con <strong class="text-[#5fd0d0] font-bold">impacto real en el territorio</strong>.
         </p>
         <div class="hero-btns flex flex-wrap gap-3">
-          <RouterLink :to="contactoEntidad"
+          <EnlaceCms :to="heroB1.to"
                       class="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary-700 rounded-full font-black text-sm uppercase tracking-widest shadow-[0_8px_25px_rgba(0,0,0,0.2)] hover:shadow-[0_14px_35px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5 active:scale-95">
-            Contáctanos
+            {{ heroB1.texto }}
             <ArrowRightIcon class="w-4 h-4 shrink-0" />
-          </RouterLink>
-          <RouterLink :to="contactoEntidad"
+          </EnlaceCms>
+          <EnlaceCms :to="heroB2.to"
                       class="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white border-2 border-white/40 rounded-full font-black text-sm uppercase tracking-widest hover:bg-white/20 hover:border-white/70 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 backdrop-blur-sm">
-            Solicitar demo
-          </RouterLink>
+            {{ heroB2.texto }}
+          </EnlaceCms>
         </div>
       </div>
 
       <!-- Foto desde tablet (debajo del texto; al lado en escritorio). En móvil el hero queda compacto. La rotulación manuscrita, solo en escritorio -->
       <div class="hero-img relative hidden md:block">
-        <p class="hidden lg:block absolute -left-6 top-4 z-10 font-hand font-semibold text-white text-3xl leading-7 -rotate-12" aria-hidden="true">
+        <p v-if="p.tiene('hero.rotulo')" class="hidden lg:block absolute -left-6 top-4 z-10 font-hand font-semibold text-white text-3xl leading-7 -rotate-12 max-w-[11rem]" aria-hidden="true">{{ p.t('hero.rotulo') }}</p>
+        <p v-else class="hidden lg:block absolute -left-6 top-4 z-10 font-hand font-semibold text-white text-3xl leading-7 -rotate-12" aria-hidden="true">
           Formación Dual<br>para territorios<br><span class="text-[#5fd0d0]">más competitivos</span>
         </p>
         <svg class="hidden lg:block absolute left-16 top-28 w-20 h-16 z-10" viewBox="0 0 100 80" fill="none" aria-hidden="true">
           <path d="M8 6 C 6 40, 40 64, 86 58" stroke="#FF8920" stroke-width="3" stroke-linecap="round" />
           <path d="M76 50 L88 58 L76 66" stroke="#FF8920" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        <img :src="consejeriaEducacion" alt="Sede de una consejería de educación"
+        <img :src="p.imagen('hero.imagen', consejeriaEducacion)" alt="Sede de una consejería de educación"
              class="blob-image w-full h-[340px] lg:h-[420px] object-cover" />
       </div>
     </div>
@@ -184,6 +187,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import dua4 from '@/assets/4_dua.jpeg'
 import dua26 from '@/assets/dua_26.jpg'
@@ -205,6 +209,8 @@ import {
   UserGroupIcon,
   ViewfinderCircleIcon,
 } from '@heroicons/vue/24/outline'
+import EnlaceCms from '@/components/common/EnlaceCms.vue'
+import { usePagina } from '@/composables/usePagina'
 
 // ── Directiva local: scroll-reveal (misma que en la home) ─────────────────────
 const vReveal = {
@@ -227,6 +233,11 @@ const vReveal = {
 const router = useRouter()
 // Todas las acciones de la página llevan al formulario con "Entidad / Administración" marcado
 const contactoEntidad = { name: 'contacto', query: { tipo: 'administracion' } }
+
+// Textos de la cabecera editables desde el panel de gestión web (config/cms_paginas.php → entidades)
+const p = usePagina('entidades', { titulo: 'Instituciones y administraciones' })
+const heroB1 = computed(() => p.boton('hero.boton_principal', { texto: 'Contáctanos', to: contactoEntidad }))
+const heroB2 = computed(() => p.boton('hero.boton_secundario', { texto: 'Solicitar demo', to: contactoEntidad }))
 
 // ── Data ───────────────────────────────────────────────────────────────────────
 const ventajas = [

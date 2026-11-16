@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { CONTACTOS, CONTENIDO, SOLO_ADMIN } from '@/admin/roles'
 
 const routes = [
   {
@@ -36,6 +37,11 @@ const routes = [
     path: '/entidades',
     name: 'entidades',
     component: () => import('@/views/EntidadesView.vue'),
+  },
+  {
+    path: '/noticias/:slug',
+    name: 'noticia-detalle',
+    component: () => import('@/views/NoticiaDetalleView.vue'),
   },
   {
     path: '/familias',
@@ -77,6 +83,45 @@ const routes = [
     name: 'contacto',
     component: () => import('@/views/ContactoView.vue'),
   },
+  // ── Panel de gestión web (WordPress-like) ─────────────────────────────────
+  // /gestion-web y no /admin: el dominio se comparte con la herramienta DuaLab.
+  {
+    path: '/gestion-web/acceso',
+    name: 'panel-acceso',
+    component: () => import('@/admin/vistas/AccesoView.vue'),
+    meta: { panel: true, titulo: 'Acceso' },
+  },
+  {
+    // Enlace del correo de invitación o de «he olvidado mi contraseña»
+    path: '/gestion-web/crear-contrasena',
+    name: 'panel-crear-contrasena',
+    component: () => import('@/admin/vistas/CrearContrasenaView.vue'),
+    meta: { panel: true, publica: true, titulo: 'Crear contraseña' },
+  },
+  {
+    path: '/gestion-web',
+    component: () => import('@/admin/AdminLayout.vue'),
+    meta: { panel: true, requiereSesion: true },
+    children: [
+      { path: '', name: 'panel-escritorio', component: () => import('@/admin/vistas/EscritorioView.vue'), meta: { titulo: 'Escritorio', roles: CONTENIDO } },
+      { path: 'paginas', name: 'panel-paginas', component: () => import('@/admin/vistas/PaginasView.vue'), meta: { titulo: 'Páginas', roles: CONTENIDO } },
+      { path: 'paginas/:clave', name: 'panel-pagina', component: () => import('@/admin/vistas/PaginaEditorView.vue'), meta: { titulo: 'Editar página', roles: CONTENIDO } },
+      { path: 'entradas', name: 'panel-entradas', component: () => import('@/admin/vistas/EntradasView.vue'), meta: { titulo: 'Entradas', roles: CONTENIDO } },
+      { path: 'entradas/nueva', name: 'panel-entrada-nueva', component: () => import('@/admin/vistas/EntradaEditorView.vue'), meta: { titulo: 'Nueva entrada', roles: CONTENIDO } },
+      { path: 'entradas/categorias', name: 'panel-categorias', component: () => import('@/admin/vistas/CategoriasView.vue'), meta: { titulo: 'Categorías', roles: CONTENIDO } },
+      { path: 'entradas/:id(\\d+)', name: 'panel-entrada', component: () => import('@/admin/vistas/EntradaEditorView.vue'), meta: { titulo: 'Editar entrada', roles: CONTENIDO } },
+      { path: 'formularios', name: 'panel-formularios', component: () => import('@/admin/vistas/FormulariosView.vue'), meta: { titulo: 'Formularios', roles: CONTACTOS } },
+      { path: 'formularios/integraciones', name: 'panel-integraciones', component: () => import('@/admin/vistas/IntegracionesView.vue'), meta: { titulo: 'Integraciones', roles: SOLO_ADMIN } },
+      { path: 'medios', name: 'panel-medios', component: () => import('@/admin/vistas/MediosView.vue'), meta: { titulo: 'Medios', roles: CONTENIDO } },
+      { path: 'perfil', name: 'panel-perfil', component: () => import('@/admin/vistas/PerfilView.vue'), meta: { titulo: 'Mi perfil' } },
+      { path: 'idiomas', name: 'panel-idiomas', component: () => import('@/admin/vistas/IdiomasView.vue'), meta: { titulo: 'Idiomas', roles: SOLO_ADMIN } },
+      { path: 'apariencia', name: 'panel-apariencia', component: () => import('@/admin/vistas/AparienciaView.vue'), meta: { titulo: 'Apariencia', roles: SOLO_ADMIN } },
+      { path: 'seo', name: 'panel-seo', component: () => import('@/admin/vistas/SeoView.vue'), meta: { titulo: 'SEO', roles: CONTENIDO } },
+      { path: 'usuarios', name: 'panel-usuarios', component: () => import('@/admin/vistas/UsuariosView.vue'), meta: { titulo: 'Usuarios', roles: SOLO_ADMIN } },
+      { path: 'actividad', name: 'panel-actividad', component: () => import('@/admin/vistas/ActividadView.vue'), meta: { titulo: 'Actividad', roles: SOLO_ADMIN } },
+      { path: 'analitica', name: 'panel-analitica', component: () => import('@/admin/vistas/AnaliticaView.vue'), meta: { titulo: 'Analítica', roles: SOLO_ADMIN } },
+    ],
+  },
   {
     path: '/:pathMatch(.*)*',
     redirect: '/',
@@ -92,6 +137,25 @@ const router = createRouter({
     if (to.hash) return new Promise(resolve => setTimeout(() => resolve({ el: to.hash, behavior: 'smooth' }), 80))
     return { top: 0 }
   },
+})
+
+// Panel de gestión web: solo comprueba la sesión en sus rutas (la web pública no
+// llama a /auth/me). Es solo UX: cada endpoint /api/admin lo protege el backend.
+router.beforeEach(async (to) => {
+  if (!to.matched.some(r => r.meta.panel)) return
+  // Todo el panel (también el acceso y crear contraseña) se ve como «Gestión web» en la pestaña
+  document.title = 'Gestión web'
+  const { usePanelSesion } = await import('@/stores/panelSesion')
+  const sesion = usePanelSesion()
+  if (!sesion.iniciada) await sesion.init()
+
+  if (to.meta.publica) return true
+  if (to.name === 'panel-acceso') {
+    return sesion.puedeEntrar ? sesion.inicio : true
+  }
+  if (!sesion.conSesion) return { name: 'panel-acceso', query: { redirect: to.fullPath } }
+  if (!sesion.puedeEntrar) return { name: 'panel-acceso', query: { sinPermiso: '1' } }
+  if (!sesion.puede(to.meta.roles)) return sesion.inicio
 })
 
 export default router

@@ -3,12 +3,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Apariencia por defecto (paleta «marca», Inter + Montserrat). El panel de gestión web
+   puede cambiarla con opciones cerradas (src/data/apariencia.js); se aplica en :root. */
+:root {
+  --c-primary-50: 246 250 252;
+  --c-primary-100: 218 232 245;
+  --c-primary-200: 186 213 236;
+  --c-primary-300: 147 189 224;
+  --c-primary-400: 107 164 213;
+  --c-primary-500: 67 140 202;
+  --c-primary-600: 48 114 170;
+  --c-primary-700: 39 93 138;
+  --c-primary-800: 30 71 106;
+  --c-primary-900: 21 50 75;
+  --c-noche: 23 40 62;     /* fondos oscuros (franja final) */
+  --c-titulos: 23 40 62;   /* texto de los títulos */
+  --fuente-texto: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --fuente-titulos: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+}
+
 @layer base {
-  html { font-family: 'Inter', sans-serif; }
+  html { font-family: var(--fuente-texto); }
   /* Titulares en Montserrat (manual, sección 07/Tipografía). En @layer base
      para que cualquier utilidad de fuente aplicada en un componente concreto
      siga ganando. */
-  h1, h2, h3, h4, h5, h6 { font-family: 'Montserrat', ui-sans-serif, system-ui; }
+  h1, h2, h3, h4, h5, h6 { font-family: var(--fuente-titulos); }
 }
 
 /* ── Scroll-reveal: estado inicial (invisible) ────────────────────────────── */

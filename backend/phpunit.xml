@@ -27,6 +27,10 @@
         <env name="DB_DATABASE" value=":memory:"/>
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
+        <!-- Los tests nunca suben a la cuenta real de Cloudinary (los que la prueban usan Http::fake) -->
+        <env name="CLOUDINARY_CLOUD_NAME" value=""/>
+        <env name="CLOUDINARY_API_KEY" value=""/>
+        <env name="CLOUDINARY_API_SECRET" value=""/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>

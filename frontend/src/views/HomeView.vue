@@ -23,12 +23,15 @@
     <div class="relative max-w-5xl mx-auto">
     <div class="max-w-2xl">
       <span class="hero-badge inline-block bg-white/15 text-white px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-6 border border-white/30">
-        Innovación Educativa B2B
+        {{ p.t('hero.antetitulo', 'Innovación Educativa B2B') }}
       </span>
       <h1 class="hero-title text-5xl md:text-6xl font-black tracking-tighter text-white leading-[1.1] mb-5">
-        Conecta talento<br>con <span class="text-transparent bg-clip-text bg-gradient-to-r from-alumnos to-administraciones">retos reales</span>
+        <template v-if="p.tiene('hero.titulo')">{{ p.t('hero.titulo') }}</template><template v-else>Conecta talento<br>con</template>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-alumnos to-administraciones">{{ p.t('hero.destacado', 'retos reales') }}</span>
       </h1>
-      <p class="hero-desc text-white/70 text-base leading-relaxed mb-8 max-w-lg">
+      <!-- Editada en el panel → texto plano; sin editar → el original con sus resaltados -->
+      <p v-if="p.tiene('hero.descripcion')" class="hero-desc text-white/70 text-base leading-relaxed mb-8 max-w-lg">{{ p.t('hero.descripcion') }}</p>
+      <p v-else class="hero-desc text-white/70 text-base leading-relaxed mb-8 max-w-lg">
         DuaLab es la <strong class="text-white font-bold">solución definitiva</strong> para conectar
         <strong class="text-[#8fc46a] font-bold">empresas</strong> con el
         <strong class="text-[#ffb066] font-bold">alumnado en prácticas</strong>.
@@ -41,13 +44,13 @@
         <button @click="comoFuncionaOpen = true"
                 class="cta-attention group inline-flex items-center gap-2 px-6 py-3 bg-white text-primary-700 rounded-full font-black text-sm uppercase tracking-widest shadow-[0_8px_25px_rgba(0,0,0,0.2)] hover:shadow-[0_14px_35px_rgba(0,0,0,0.3)] hover:[animation-play-state:paused] transition-all duration-300 hover:-translate-y-0.5 active:scale-95 whitespace-nowrap">
           <svg class="w-4 h-4 transition-transform group-hover:rotate-90 duration-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-          Cómo funciona
+          {{ p.t('hero.boton_como_funciona', 'Cómo funciona') }}
         </button>
 
-        <button @click="goToContact()"
+        <EnlaceCms :to="heroDemo.to"
                 class="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white border-2 border-white/40 rounded-full font-black text-sm uppercase tracking-widest hover:bg-white/20 hover:border-white/70 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 backdrop-blur-sm whitespace-nowrap">
-          Solicitar demo
-        </button>
+          {{ heroDemo.texto }}
+        </EnlaceCms>
       </div>
 
     </div>
@@ -71,10 +74,10 @@
   <!-- STATS -->
   <section class="bg-white pt-8 px-6">
     <div v-reveal class="max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center pb-8">
-      <StatItem number="50+"  label="Retos Activos" />
-      <StatItem number="3"    label="Niveles de Dificultad" />
-      <StatItem number="20+"  label="Empresas" />
-      <StatItem number="100%" label="Aplicable a la vida laboral" />
+      <StatItem :number="p.t('estadisticas.cifra_1', '50+')"  :label="p.t('estadisticas.etiqueta_1', 'Retos Activos')" />
+      <StatItem :number="p.t('estadisticas.cifra_2', '3')"    :label="p.t('estadisticas.etiqueta_2', 'Niveles de Dificultad')" />
+      <StatItem :number="p.t('estadisticas.cifra_3', '20+')"  :label="p.t('estadisticas.etiqueta_3', 'Empresas')" />
+      <StatItem :number="p.t('estadisticas.cifra_4', '100%')" :label="p.t('estadisticas.etiqueta_4', 'Aplicable a la vida laboral')" />
     </div>
   </section>
   <!-- Franja con los cuatro colores de colectivo -->
@@ -86,11 +89,12 @@
   <section id="ecosistema" class="bg-white py-20 px-6">
     <div class="max-w-6xl mx-auto grid xl:grid-cols-[4fr_8fr] gap-14 items-center">
       <div v-reveal>
-        <p class="section-eyebrow">Un ecosistema colaborativo</p>
+        <p class="section-eyebrow">{{ p.t('ecosistema.antetitulo', 'Un ecosistema colaborativo') }}</p>
         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">
-          Todo el ecosistema de la Formación Dual, <span class="text-primary-600">conectado</span>
+          {{ p.t('ecosistema.titulo', 'Todo el ecosistema de la Formación Dual,') }} <span class="text-primary-600">{{ p.t('ecosistema.destacado', 'conectado') }}</span>
         </h2>
-        <p class="text-gray-500 leading-relaxed mt-5 max-w-md">
+        <p v-if="p.tiene('ecosistema.descripcion')" class="text-gray-500 leading-relaxed mt-5 max-w-md">{{ p.t('ecosistema.descripcion') }}</p>
+        <p v-else class="text-gray-500 leading-relaxed mt-5 max-w-md">
           DuaLab pone en relación a todos los <strong class="text-centros font-semibold">agentes</strong>
           de la FP Dual en un entorno único, facilitando la <strong class="text-alumnos font-semibold">gestión</strong>,
           la colaboración y la generación de
@@ -98,7 +102,7 @@
           y <strong class="text-empresas font-semibold">empleo</strong>.
         </p>
         <button type="button" class="btn-pill-outline mt-8" @click="comoFuncionaOpen = true">
-          Descubre en qué consiste
+          {{ p.t('ecosistema.boton', 'Descubre en qué consiste') }}
         </button>
       </div>
       <div v-reveal="150">
@@ -110,10 +114,10 @@
   <!-- SOLUCIÓN INTEGRAL (funcionalidades clave + servicios actuales) -->
   <section id="servicios" class="bg-superficie py-20 px-6">
     <div v-reveal class="max-w-4xl mx-auto text-center mb-12">
-      <p class="section-eyebrow">Funcionalidades clave</p>
+      <p class="section-eyebrow">{{ p.t('funcionalidades.antetitulo', 'Funcionalidades clave') }}</p>
       <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">
-        Una solución integral para una Formación Dual<br class="hidden md:block">
-        <span class="text-primary-600"> más eficiente</span>
+        {{ p.t('funcionalidades.titulo', 'Una solución integral para una Formación Dual') }}<br class="hidden md:block">
+        <span class="text-primary-600"> {{ p.t('funcionalidades.destacado', 'más eficiente') }}</span>
       </h2>
     </div>
     <div v-reveal="100" class="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -153,25 +157,27 @@
   <section class="bg-white py-20 px-6 overflow-hidden">
     <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 items-center">
       <div v-reveal class="relative z-10">
-        <p class="section-eyebrow">Aprendizaje real</p>
-        <h2 class="text-3xl md:text-[42px] font-extrabold tracking-tight text-azul-noche leading-[1.1]">
+        <p class="section-eyebrow">{{ p.t('retos.antetitulo', 'Aprendizaje real') }}</p>
+        <h2 v-if="p.tiene('retos.titulo')" class="text-3xl md:text-[42px] font-extrabold tracking-tight text-azul-noche leading-[1.1]">{{ p.t('retos.titulo') }}</h2>
+        <h2 v-else class="text-3xl md:text-[42px] font-extrabold tracking-tight text-azul-noche leading-[1.1]">
           Retos académicos que generan <span class="text-primary-500">talento</span>
           y <span class="text-primary-500">soluciones</span> reales.
         </h2>
-        <p class="text-gray-500 leading-relaxed mt-5 max-w-md">
+        <p v-if="p.tiene('retos.descripcion')" class="text-gray-500 leading-relaxed mt-5 max-w-md">{{ p.t('retos.descripcion') }}</p>
+        <p v-else class="text-gray-500 leading-relaxed mt-5 max-w-md">
           Los retos de DuaLab acercan al alumnado a proyectos planteados por empresas,
           fomentando la <strong class="text-primary-600 font-semibold">innovación</strong>, el trabajo en equipo
           y el desarrollo de <strong class="text-primary-600 font-semibold">competencias clave</strong>.
         </p>
         <div class="flex flex-col gap-3 mt-10 max-w-xs">
-          <RouterLink :to="{ name: 'contacto', query: { tipo: 'centro' } }" class="btn-pill bg-centros hover:bg-centros/90">Inscribe tu centro</RouterLink>
-          <RouterLink :to="{ name: 'contacto', query: { tipo: 'empresa' } }" class="btn-pill bg-empresas hover:bg-empresas/90">Participa como empresa</RouterLink>
+          <EnlaceCms :to="retosCentro.to" class="btn-pill bg-centros hover:bg-centros/90">{{ retosCentro.texto }}</EnlaceCms>
+          <EnlaceCms :to="retosEmpresa.to" class="btn-pill bg-empresas hover:bg-empresas/90">{{ retosEmpresa.texto }}</EnlaceCms>
           <!-- Formulario de alumnado bloqueado de momento (ver contactoConfig.js) -->
           <span class="btn-pill bg-alumnos/50 shadow-none cursor-not-allowed hover:translate-y-0" aria-disabled="true" title="Próximamente">
             Encuentra tus prácticas
             <span class="text-[10px] font-black bg-white/25 rounded-full px-2 py-0.5 normal-case tracking-normal">Próximamente</span>
           </span>
-          <RouterLink :to="{ name: 'familias' }" class="btn-pill bg-administraciones hover:bg-administraciones/90">Explora retos</RouterLink>
+          <EnlaceCms :to="retosExplorar.to" class="btn-pill bg-administraciones hover:bg-administraciones/90">{{ retosExplorar.texto }}</EnlaceCms>
         </div>
       </div>
 
@@ -188,7 +194,7 @@
           <path d="M8 6 C 10 36, 40 50, 88 44" stroke="#19A7A8" stroke-width="2.5" stroke-linecap="round" />
           <path d="M78 36 L90 44 L78 52" stroke="#19A7A8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        <img :src="dua26" alt="Alumnado trabajando en un reto en el aula"
+        <img :src="p.imagen('retos.imagen', dua26)" alt="Alumnado trabajando en un reto en el aula"
              class="blob-image w-full h-[340px] md:h-[440px] object-cover mt-20 md:mt-16" loading="lazy" />
       </div>
     </div>
@@ -197,8 +203,8 @@
   <!-- UNA SOLUCIÓN PARA CADA AGENTE (antes: Para Empresas / Centros / Alumnos) -->
   <section class="bg-superficie py-20 px-6">
     <div v-reveal class="max-w-4xl mx-auto text-center mb-10">
-      <p class="section-eyebrow">Cuatro agentes, un mismo objetivo</p>
-      <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche">Una solución para cada agente</h2>
+      <p class="section-eyebrow">{{ p.t('agentes.antetitulo', 'Cuatro agentes, un mismo objetivo') }}</p>
+      <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche">{{ p.t('agentes.titulo', 'Una solución para cada agente') }}</h2>
     </div>
     <div class="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
       <div v-for="(a, i) in agentes" :id="a.id" :key="a.title" v-reveal="i * 100" class="scroll-mt-24">
@@ -215,13 +221,13 @@
         <PlatformMockup />
       </div>
       <div v-reveal="150" class="order-1 lg:order-2">
-        <p class="section-eyebrow">Plataforma DuaLab</p>
-        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">
+        <p class="section-eyebrow">{{ p.t('plataforma.antetitulo', 'Plataforma DuaLab') }}</p>
+        <h2 v-if="p.tiene('plataforma.titulo')" class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">{{ p.t('plataforma.titulo') }}</h2>
+        <h2 v-else class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">
           Toda la <span class="text-primary-500">gestión</span><br>en un <span class="text-primary-500">mismo lugar</span>
         </h2>
         <p class="text-gray-500 leading-relaxed mt-5">
-          Una plataforma intuitiva y completa para gestionar prácticas, tutores, documentación,
-          comunicaciones y mucho más, con información siempre actualizada y accesible para todos los agentes.
+          {{ p.t('plataforma.descripcion', 'Una plataforma intuitiva y completa para gestionar prácticas, tutores, documentación, comunicaciones y mucho más, con información siempre actualizada y accesible para todos los agentes.') }}
         </p>
         <ul class="space-y-2 mt-6">
           <li v-for="p in plataformaFeatures" :key="p" class="flex items-center gap-2.5 font-medium text-azul-noche">
@@ -232,7 +238,7 @@
           </li>
         </ul>
         <div class="flex flex-wrap gap-3 mt-8">
-          <button type="button" class="btn-pill bg-primary-600 hover:bg-primary-700 px-8" @click="goToContact()">Solicitar demo</button>
+          <EnlaceCms :to="plataformaDemo.to" class="btn-pill bg-primary-600 hover:bg-primary-700 px-8">{{ plataformaDemo.texto }}</EnlaceCms>
           <!-- Enlace externo: la herramienta es otra SPA (mismo botón que en el navbar) -->
           <a :href="`${toolUrl}/login`" class="btn-pill-outline">Usar DuaLab</a>
         </div>
@@ -243,9 +249,9 @@
   <!-- GALERÍA -->
   <section id="experiencia" class="bg-superficie py-20 px-6 scroll-mt-16">
     <div v-reveal class="max-w-5xl mx-auto text-center mb-10">
-      <div class="inline-block bg-primary-100 text-primary-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-4 border border-primary-200">Nuestra galería</div>
-      <h2 class="text-3xl font-black tracking-tighter text-azul-noche">Hablamos con experiencia</h2>
-      <p class="text-gray-500 mt-2 font-medium">Momentos reales de formación, retos y trabajo en equipo</p>
+      <div class="inline-block bg-primary-100 text-primary-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-4 border border-primary-200">{{ p.t('galeria.etiqueta', 'Nuestra galería') }}</div>
+      <h2 class="text-3xl font-black tracking-tighter text-azul-noche">{{ p.t('galeria.titulo', 'Hablamos con experiencia') }}</h2>
+      <p class="text-gray-500 mt-2 font-medium">{{ p.t('galeria.subtitulo', 'Momentos reales de formación, retos y trabajo en equipo') }}</p>
     </div>
     <div v-reveal="100" class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-5">
       <button v-for="img in galeriaImages" :key="img" type="button"
@@ -276,12 +282,12 @@
   <!-- FAMILIAS PROFESIONALES (solo el rótulo y "Profesionales" en tono Alumnado) -->
   <section class="bg-white py-20 px-6">
     <div v-reveal class="max-w-4xl mx-auto text-center mb-8">
-      <p class="section-eyebrow !text-alumnos">Formación</p>
+      <p class="section-eyebrow !text-alumnos">{{ p.t('familias.antetitulo', 'Formación') }}</p>
       <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche">Familias <span class="text-alumnos">Profesionales</span></h2>
-      <p class="text-gray-500 mt-2 font-medium">Retos organizados en áreas clave del mercado laboral</p>
+      <p class="text-gray-500 mt-2 font-medium">{{ p.t('familias.subtitulo', 'Retos organizados en áreas clave del mercado laboral') }}</p>
     </div>
     <div v-reveal="100" class="text-center">
-      <RouterLink :to="{ name: 'familias' }" class="btn-pill bg-primary-600 hover:bg-primary-700 px-8">Ver familias</RouterLink>
+      <EnlaceCms :to="familiasBoton.to" class="btn-pill bg-primary-600 hover:bg-primary-700 px-8">{{ familiasBoton.texto }}</EnlaceCms>
     </div>
   </section>
 
@@ -291,7 +297,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import dua1 from '@/assets/1_dua.jpeg'
 import dua2 from '@/assets/2_dua.jpg'
@@ -337,6 +343,8 @@ import CtaTransforma from '@/components/common/CtaTransforma.vue'
 import ServiceItem     from '@/components/home/ServiceItem.vue'
 import ServiceModal    from '@/components/home/ServiceModal.vue'
 import GalleryModal    from '@/components/home/GalleryModal.vue'
+import EnlaceCms       from '@/components/common/EnlaceCms.vue'
+import { usePagina }   from '@/composables/usePagina'
 import {
   BriefcaseIcon,
   PresentationChartBarIcon,
@@ -374,8 +382,17 @@ const vReveal = {
   },
 }
 
+// ── Textos editables desde el panel de gestión web (config/cms_paginas.php → inicio) ──
+const p = usePagina('inicio', { titulo: 'Conecta talento con retos reales' })
+const heroDemo       = computed(() => p.boton('hero.boton_demo', { texto: 'Solicitar demo', to: { name: 'contacto' } }))
+const retosCentro    = computed(() => p.boton('retos.boton_centro', { texto: 'Inscribe tu centro', to: { name: 'contacto', query: { tipo: 'centro' } } }))
+const retosEmpresa   = computed(() => p.boton('retos.boton_empresa', { texto: 'Participa como empresa', to: { name: 'contacto', query: { tipo: 'empresa' } } }))
+const retosExplorar  = computed(() => p.boton('retos.boton_explorar', { texto: 'Explora retos', to: { name: 'familias' } }))
+const plataformaDemo = computed(() => p.boton('plataforma.boton_demo', { texto: 'Solicitar demo', to: { name: 'contacto' } }))
+const familiasBoton  = computed(() => p.boton('familias.boton', { texto: 'Ver familias', to: { name: 'familias' } }))
+
 // ── Carousel ──────────────────────────────────────────────────────────────────
-const heroSlides = [
+const slidesOriginales = [
   { image: dua1 },
   { image: dua2 },
   { image: dua3 },
@@ -385,6 +402,9 @@ const heroSlides = [
   { image: dua7 },
   { image: dua8 },
 ]
+// Fotos del carrusel y de la galería: las del panel (Páginas → Inicio) o las originales
+const fotosPanel = campo => (p.valores.value[campo]?.length ? p.valores.value[campo] : null)
+const heroSlides = computed(() => fotosPanel('hero.fotos_carrusel')?.map(image => ({ image })) ?? slidesOriginales)
 
 const activeService = ref(null)
 const moreServicesOpen = ref(false)
@@ -392,21 +412,22 @@ const moreServicesOpen = ref(false)
 // La herramienta DuaLab (otra SPA): mismo destino que "Usar DuaLab" del navbar.
 const toolUrl = import.meta.env.VITE_TOOL_URL ?? (import.meta.env.DEV ? 'http://localhost:5173' : 'https://dualab.es')
 
-const galeriaImages = [dua11, dua14, dua21]
+const galeriaImages = computed(() => fotosPanel('galeria.fotos')?.slice(0, 3) ?? [dua11, dua14, dua21])
 const galleryOpen = ref(false)
 const galleryStart = ref(0)
 // Abre la galería en la foto pulsada (o en la primera desde "Ver más").
 function openGallery(img) {
-  galleryStart.value = img ? Math.max(allGalleryImages.indexOf(img), 0) : 0
+  galleryStart.value = img ? Math.max(allGalleryImages.value.indexOf(img), 0) : 0
   galleryOpen.value = true
 }
-const allGalleryImages = [
+const galeriaOriginal = [
   dua1, dua2, dua3, dua4, dua5, dua6, dua7, dua8,
   dua9, dua10, dua11, dua12, dua13, dua14,
   dua16, dua17, dua18, dua19, dua20, dua21,
   dua22, dua23, dua24, dua25, dua26,
   dua27, dua28, dua29, dua30, dua32,
 ]
+const allGalleryImages = computed(() => fotosPanel('galeria.fotos') ?? galeriaOriginal)
 
 const heroIndex = ref(0)
 let heroTimer = null
@@ -418,7 +439,7 @@ function goToSlide(i) {
 }
 
 function nextSlide() {
-  heroIndex.value = (heroIndex.value + 1) % heroSlides.length
+  heroIndex.value = (heroIndex.value + 1) % heroSlides.value.length
 }
 
 onMounted(() => { heroTimer = setInterval(nextSlide, 5000) })

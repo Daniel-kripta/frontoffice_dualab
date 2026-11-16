@@ -56,6 +56,7 @@ import { useRoute } from 'vue-router'
 import { ChevronLeftIcon, RocketLaunchIcon } from '@heroicons/vue/24/outline'
 import ContactForm from '@/components/home/ContactForm.vue'
 import microretosPublicApi from '@/services/microretosPublicApi'
+import { usePagina } from '@/composables/usePagina'
 
 const route = useRoute()
 
@@ -76,4 +77,7 @@ const puntos = [
   { title: 'Entregables y resultado final', desc: 'El trabajo entregado a la empresa y su valoración.' },
   { title: 'La plataforma por dentro', desc: 'Cómo DuaLab gestiona retos, equipos y seguimiento.' },
 ]
+
+// SEO editable desde el panel de gestión web (config/cms_paginas.php → solicitar-demo)
+usePagina('solicitar-demo', { titulo: 'Solicitar demo' })
 </script>

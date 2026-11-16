@@ -23,6 +23,8 @@ class ContactoRequest extends FormRequest
                 ? array_diff(Op::TIPOS, Op::TIPOS_BLOQUEADOS)
                 : ['empresa', 'centro', 'alumno'])],
             'telefono' => ['nullable', 'string', 'max:20'],
+            // Ruta de la web desde la que se envía (bandeja de formularios del panel).
+            'pagina_origen' => ['nullable', 'string', 'max:255', 'regex:/^\/[^\s]*$/'],
         ];
 
         if (! $this->filled('accion')) {
@@ -120,7 +122,7 @@ class ContactoRequest extends FormRequest
     }
 
     /** Campos que van a columnas propias de `contactos` (el resto de lo validado acaba en `datos`). */
-    private const COLUMNAS = ['nombre', 'apellidos', 'email', 'tipo', 'accion', 'telefono', 'cargo'];
+    private const COLUMNAS = ['nombre', 'apellidos', 'email', 'tipo', 'accion', 'telefono', 'cargo', 'pagina_origen'];
 
     /** Campos que no son ni columnas de persona ni datos del agente: origen y consentimiento. */
     private const SEGUIMIENTO = ['origen', 'consentimiento_marketing'];
