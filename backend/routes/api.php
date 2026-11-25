@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\Integraciones\CentralCorreoController;
+use App\Http\Controllers\Api\Integraciones\CentralFormularioController;
+use App\Http\Middleware\VerificarFirmaCentral;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FamiliaController;
@@ -38,6 +41,28 @@ Route::prefix('web')->name('web.')->middleware('throttle:60,1,web-publica')->gro
     Route::get('entradas/{slug}',   [WebController::class, 'entrada'])->name('entradas.show')->where('slug', '[a-z0-9\-]+');
 });
 
+// ── DuaLab Central → «Primer contacto» (servidor a servidor, sin sesión: firma HMAC) ──
+Route::prefix('integraciones/central')->name('central.')
+    ->middleware([VerificarFirmaCentral::class, 'throttle:120,1,central-api'])->group(function () {
+        Route::get('formularios/exportar',     [CentralFormularioController::class, 'exportar'])->middleware('throttle:10,1,central-exportar')->name('formularios.exportar');
+        Route::get('formularios',              [CentralFormularioController::class, 'index'])->name('formularios.index');
+        Route::get('formularios/{contacto}',   [CentralFormularioController::class, 'show'])->whereNumber('contacto')->name('formularios.show');
+        Route::patch('formularios/{contacto}', [CentralFormularioController::class, 'update'])->whereNumber('contacto')->name('formularios.update');
+
+        // Correo de info@ (específicas antes de correo/{correo}; el adjunto tiene que ser de ese correo)
+        Route::post('correo/enviar',                    [CentralCorreoController::class, 'enviar'])->middleware('throttle:20,1,central-correo-enviar')->name('correo.enviar');
+        Route::get('correo/envios/{envio}',             [CentralCorreoController::class, 'envio'])->whereNumber('envio')->name('correo.envio');
+        Route::post('correo/envios/{envio}/reintentar', [CentralCorreoController::class, 'reintentar'])->whereNumber('envio')->middleware('throttle:10,1,central-correo-enviar')->name('correo.reintentar');
+        Route::delete('correo/envios/{envio}',          [CentralCorreoController::class, 'descartar'])->whereNumber('envio')->name('correo.descartar');
+        Route::delete('correo/papelera',                [CentralCorreoController::class, 'vaciarPapelera'])->name('correo.vaciar');
+        Route::get('correo',                            [CentralCorreoController::class, 'index'])->name('correo.index');
+        Route::get('correo/{correo}',                   [CentralCorreoController::class, 'show'])->whereNumber('correo')->name('correo.show');
+        Route::patch('correo/{correo}',                 [CentralCorreoController::class, 'update'])->whereNumber('correo')->name('correo.update');
+        Route::delete('correo/{correo}',                [CentralCorreoController::class, 'destroy'])->whereNumber('correo')->name('correo.destroy');
+        Route::get('correo/{correo}/adjuntos/{adjunto}', [CentralCorreoController::class, 'adjunto'])
+            ->scopeBindings()->whereNumber(['correo', 'adjunto'])->middleware('throttle:30,1,central-correo-adjuntos')->name('correo.adjunto');
+    });
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('mis-inscripciones',              [InscripcionController::class, 'index']);
     Route::post('retos/{reto}/inscribirse',      [InscripcionController::class, 'store']);
@@ -55,14 +80,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('perfil',   [Admin\PerfilController::class, 'show'])->name('perfil.show');
         Route::patch('perfil', [Admin\PerfilController::class, 'update'])->middleware('throttle:10,1,panel-perfil')->name('perfil.update');
 
-        // Formularios: también el rol «contactos»
-        Route::middleware('can:atender-contactos')->group(function () {
-            Route::get('formularios/exportar',        [Admin\FormularioController::class, 'exportar'])->middleware('throttle:10,1,panel-exportar')->name('formularios.exportar');
-            Route::get('formularios',                 [Admin\FormularioController::class, 'index'])->name('formularios.index');
-            Route::get('formularios/{contacto}',      [Admin\FormularioController::class, 'show'])->name('formularios.show');
-            Route::patch('formularios/{contacto}',    [Admin\FormularioController::class, 'update'])->name('formularios.update');
-            Route::delete('formularios/{contacto}',   [Admin\FormularioController::class, 'destroy'])->name('formularios.destroy');
-        });
+        // Formularios y correo de info@: se atienden en DuaLab Central («Primer contacto») por la API
+        // firmada de arriba (integraciones/central); ya no hay rutas del panel para ellos
 
         // Equipo: usuarios del panel y registro de actividad (solo admin)
         Route::middleware('can:administrar-web')->group(function () {
@@ -77,12 +96,14 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('usuarios/{usuario}/reenviar-correo', [Admin\UsuarioController::class, 'reenviarCorreo'])->middleware('throttle:6,1,panel-reenviar-correo')->name('usuarios.reenviar');
             Route::patch('usuarios/{usuario}',            [Admin\UsuarioController::class, 'update'])->name('usuarios.update');
             Route::delete('usuarios/{usuario}',           [Admin\UsuarioController::class, 'destroy'])->name('usuarios.destroy');
+
         });
     });
 
     // ── Contenido y ajustes del panel: admin y editor ─────────────────────────
     Route::prefix('admin')->name('admin.')->middleware('can:gestionar-web')->group(function () {
         Route::get('escritorio', Admin\EscritorioController::class)->name('escritorio');
+        Route::get('vista-buscadores', Admin\VistaBuscadoresController::class)->middleware('throttle:30,1,panel-vista-buscadores')->name('vista-buscadores');
         Route::get('actividad/{tipo}/{ref}', [Admin\ActividadController::class, 'historial'])->name('actividad.historial');
 
         Route::get('paginas',          [Admin\PaginaController::class, 'index'])->name('paginas.index');

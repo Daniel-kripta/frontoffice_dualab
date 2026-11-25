@@ -19,7 +19,6 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import './panel.css'
 import BarraSuperior from './componentes/BarraSuperior.vue'
 import PanelLateral from './componentes/PanelLateral.vue'
 import AvisosPanel from './componentes/AvisosPanel.vue'

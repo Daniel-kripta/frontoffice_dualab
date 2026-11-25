@@ -68,7 +68,7 @@
   <!-- VENTAJAS -->
   <section class="bg-white py-14 px-6">
     <div v-reveal class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-0 lg:divide-x lg:divide-gray-100">
-      <div v-for="v in ventajas" :key="v.title" class="flex sm:flex-col gap-4 sm:gap-3 lg:px-5 lg:first:pl-0 lg:last:pr-0">
+      <div v-for="v in ventajasTextos" :key="v.title" class="flex sm:flex-col gap-4 sm:gap-3 lg:px-5 lg:first:pl-0 lg:last:pr-0">
         <span class="w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0" :class="v.bg">
           <component :is="v.icon" class="w-6 h-6" />
         </span>
@@ -91,27 +91,26 @@
             <ChartBarIcon class="w-6 h-6" />
           </span>
           <div class="min-w-0">
-            <p class="font-heading font-extrabold text-2xl text-azul-noche leading-none">{{ destacado.valor }}</p>
-            <p class="text-xs text-gray-500 mt-1">{{ destacado.texto }}</p>
+            <p class="font-heading font-extrabold text-2xl text-azul-noche leading-none">{{ p.t('plataforma.cifra', destacado.valor) }}</p>
+            <p class="text-xs text-gray-500 mt-1">{{ p.t('plataforma.cifra_texto', destacado.texto) }}</p>
           </div>
         </div>
       </div>
 
       <div v-reveal="150">
-        <p class="section-eyebrow">Plataforma DuaLab</p>
+        <p class="section-eyebrow">{{ p.t('plataforma.antetitulo', 'Plataforma DuaLab') }}</p>
         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">
-          Todo lo que tu centro necesita para la <span class="text-primary-500">Formación Dual</span>
+          {{ p.t('plataforma.titulo', 'Todo lo que tu centro necesita para la') }} <span class="text-primary-500">{{ p.t('plataforma.destacado', 'Formación Dual') }}</span>
         </h2>
         <p class="text-gray-500 leading-relaxed mt-5">
-          Una plataforma intuitiva y completa, diseñada para equipos directivos, tutores y departamentos,
-          que centraliza procesos, documentación y comunicación en un solo lugar.
+          {{ p.t('plataforma.descripcion', 'Una plataforma intuitiva y completa, diseñada para equipos directivos, tutores y departamentos, que centraliza procesos, documentación y comunicación en un solo lugar.') }}
         </p>
         <ul class="mt-6 bg-white rounded-2xl divide-y divide-gray-100 shadow-[0_2px_12px_rgba(23,40,62,0.05)]">
-          <li v-for="p in plataforma" :key="p.label" class="flex items-center gap-4 px-4 py-3">
-            <span class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" :class="p.soft">
-              <component :is="p.icon" class="w-5 h-5" />
+          <li v-for="item in plataformaTextos" :key="item.label" class="flex items-center gap-4 px-4 py-3">
+            <span class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" :class="item.soft">
+              <component :is="item.icon" class="w-5 h-5" />
             </span>
-            <span class="flex-1 min-w-0 font-medium text-sm text-azul-noche">{{ p.label }}</span>
+            <span class="flex-1 min-w-0 font-medium text-sm text-azul-noche">{{ item.label }}</span>
             <CheckIcon class="w-4 h-4 text-administraciones shrink-0" aria-hidden="true" />
           </li>
         </ul>
@@ -123,16 +122,16 @@
   <section class="bg-white py-20 px-6">
     <div class="max-w-6xl mx-auto">
       <div v-reveal class="mb-10">
-        <p class="section-eyebrow">Cómo funciona</p>
+        <p class="section-eyebrow">{{ p.t('pasos.antetitulo', 'Cómo funciona') }}</p>
         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">
-          Implanta <span class="text-primary-500">DuaLab</span> en tu centro en 4 pasos
+          {{ p.t('pasos.titulo', 'Implanta') }} <span class="text-primary-500">{{ p.t('pasos.destacado', 'DuaLab') }}</span> {{ p.t('pasos.titulo_final', 'en tu centro en 4 pasos') }}
         </h2>
       </div>
       <ol v-reveal="100" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <li v-for="(p, i) in pasos" :key="p.title"
+        <li v-for="(paso, i) in pasosTextos" :key="paso.title"
             class="bg-superficie rounded-2xl p-5">
           <div class="flex items-center gap-3">
-            <span class="w-11 h-11 rounded-full flex items-center justify-center text-white font-heading font-black text-lg shadow-md shrink-0" :class="p.bg">
+            <span class="w-11 h-11 rounded-full flex items-center justify-center text-white font-heading font-black text-lg shadow-md shrink-0" :class="paso.bg">
               {{ i + 1 }}
             </span>
             <!-- Conector hacia el siguiente paso (solo en fila completa) -->
@@ -141,8 +140,8 @@
               <ArrowRightIcon class="w-4 h-4 text-primary-400 -ml-1" />
             </span>
           </div>
-          <h3 class="font-heading font-bold text-azul-noche mt-4">{{ p.title }}</h3>
-          <p class="text-sm text-gray-500 leading-snug mt-1">{{ p.desc }}</p>
+          <h3 class="font-heading font-bold text-azul-noche mt-4">{{ paso.title }}</h3>
+          <p class="text-sm text-gray-500 leading-snug mt-1">{{ paso.desc }}</p>
         </li>
       </ol>
     </div>
@@ -152,16 +151,16 @@
   <section class="bg-superficie py-20 px-6">
     <div class="max-w-6xl mx-auto">
       <div v-reveal class="mb-10">
-        <p class="section-eyebrow">Casos de uso</p>
+        <p class="section-eyebrow">{{ p.t('casos.antetitulo', 'Casos de uso') }}</p>
         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">
-          Soluciones para cada <span class="text-primary-500">realidad educativa</span>
+          {{ p.t('casos.titulo', 'Soluciones para cada') }} <span class="text-primary-500">{{ p.t('casos.destacado', 'realidad educativa') }}</span>
         </h2>
         <p class="text-gray-500 leading-relaxed mt-3">
-          DuaLab se adapta a las necesidades de cada centro, independientemente de su tamaño o familia profesional.
+          {{ p.t('casos.descripcion', 'DuaLab se adapta a las necesidades de cada centro, independientemente de su tamaño o familia profesional.') }}
         </p>
       </div>
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <article v-for="(c, i) in casos" :key="c.title" v-reveal="i * 100"
+        <article v-for="(c, i) in casosTextos" :key="c.title" v-reveal="i * 100"
                  class="bg-white rounded-2xl overflow-hidden flex flex-col shadow-[0_2px_12px_rgba(23,40,62,0.05)]">
           <img :src="c.image" :alt="c.alt" class="w-full h-48 object-cover" loading="lazy" />
           <div class="p-5 flex gap-4 flex-1">
@@ -171,11 +170,11 @@
             <div class="min-w-0 flex flex-col">
               <h3 class="font-heading font-bold text-azul-noche">{{ c.title }}</h3>
               <p class="text-sm text-gray-500 leading-snug mt-1 flex-1">{{ c.desc }}</p>
-              <RouterLink :to="contactoCentro"
+              <EnlaceCms :to="enlaceTarjetas.to"
                           class="inline-flex items-center gap-1.5 self-start mt-2 py-2.5 text-sm font-bold text-primary-600 hover:text-primary-700 group">
-                Ver caso
+                {{ enlaceTarjetas.texto }}
                 <ArrowRightIcon class="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </RouterLink>
+              </EnlaceCms>
             </div>
           </div>
         </article>
@@ -191,15 +190,15 @@
           <path d="M0 40V22C0 10 6 2 18 0l2 6c-6 2-9 6-9 12h9v22H0zm28 0V22c0-12 6-20 18-22l2 6c-6 2-9 6-9 12h9v22H28z" />
         </svg>
         <blockquote class="font-medium italic text-lg leading-relaxed text-white/90 relative">
-          {{ testimonio.cita }}
+          {{ p.t('testimonio.cita', testimonio.cita) }}
         </blockquote>
         <figcaption class="flex items-center gap-4 relative z-10 pr-16">
           <span class="w-12 h-12 rounded-full bg-centros text-white font-heading font-bold flex items-center justify-center shrink-0" aria-hidden="true">
-            {{ iniciales(testimonio.nombre) }}
+            {{ iniciales(p.t('testimonio.nombre', testimonio.nombre)) }}
           </span>
           <span class="min-w-0 text-sm">
-            <span class="block font-bold">{{ testimonio.nombre }}</span>
-            <span class="block text-white/70">{{ testimonio.cargo }}</span>
+            <span class="block font-bold">{{ p.t('testimonio.nombre', testimonio.nombre) }}</span>
+            <span class="block text-white/70">{{ p.t('testimonio.cargo', testimonio.cargo) }}</span>
           </span>
         </figcaption>
         <!-- Barrido de colores de marca en la esquina, como en el diseño -->
@@ -207,20 +206,20 @@
       </figure>
 
       <div v-reveal="150" class="bg-superficie p-8 sm:p-10">
-        <p class="section-eyebrow">Resultados reales</p>
+        <p class="section-eyebrow">{{ p.t('resultados.antetitulo', 'Resultados reales') }}</p>
         <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-azul-noche leading-tight">
-          Centros que ya confían en <span class="text-primary-500">DuaLab</span>
+          {{ p.t('resultados.titulo', 'Centros que ya confían en') }} <span class="text-primary-500">{{ p.t('resultados.destacado', 'DuaLab') }}</span>
         </h2>
         <div class="grid sm:grid-cols-3 gap-4 mt-6">
-          <div v-for="r in resultados" :key="r.texto" class="bg-white rounded-2xl p-4">
+          <div v-for="r in resultadosTextos" :key="r.texto" class="bg-white rounded-2xl p-4">
             <p class="font-heading font-extrabold text-3xl text-empresas leading-none">{{ r.valor }}</p>
             <p class="text-sm text-gray-500 leading-snug mt-2">{{ r.texto }}</p>
           </div>
         </div>
-        <RouterLink :to="{ name: 'noticias' }" class="btn-pill-outline mt-8">
-          Ver más casos de éxito
+        <EnlaceCms :to="resultadosBoton.to" class="btn-pill-outline mt-8">
+          {{ resultadosBoton.texto }}
           <ArrowRightIcon class="w-4 h-4" />
-        </RouterLink>
+        </EnlaceCms>
       </div>
     </div>
   </section>
@@ -229,19 +228,19 @@
   <section class="bg-white pb-20 px-6">
     <div class="max-w-6xl mx-auto grid lg:grid-cols-[5fr_7fr] gap-10 items-start">
       <div v-reveal>
-        <p class="section-eyebrow">Preguntas frecuentes</p>
-        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">Resolvemos tus dudas</h2>
+        <p class="section-eyebrow">{{ p.t('preguntas.antetitulo', 'Preguntas frecuentes') }}</p>
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">{{ p.t('preguntas.titulo', 'Resolvemos tus dudas') }}</h2>
         <p class="text-gray-500 leading-relaxed mt-4 max-w-md">
-          Aquí encontrarás respuestas a las preguntas más habituales sobre el uso de DuaLab en centros educativos.
+          {{ p.t('preguntas.descripcion', 'Aquí encontrarás respuestas a las preguntas más habituales sobre el uso de DuaLab en centros educativos.') }}
         </p>
-        <RouterLink :to="contactoCentro" class="btn-pill-outline mt-8">
-          Hacer otra pregunta
+        <EnlaceCms :to="preguntasBoton.to" class="btn-pill-outline mt-8">
+          {{ preguntasBoton.texto }}
           <ArrowRightIcon class="w-4 h-4" />
-        </RouterLink>
+        </EnlaceCms>
       </div>
 
       <div v-reveal="150" class="space-y-3">
-        <div v-for="(f, i) in faqs" :key="f.q" class="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_12px_rgba(23,40,62,0.05)]">
+        <div v-for="(f, i) in faqsTextos" :key="f.q" class="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_12px_rgba(23,40,62,0.05)]">
           <button type="button"
                   class="w-full flex items-center gap-4 text-left px-5 py-4 font-medium text-sm text-azul-noche focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 rounded-2xl"
                   :aria-expanded="faqAbierta === i" :aria-controls="`faq-${i}`"
@@ -312,10 +311,14 @@ const router = useRouter()
 // Todas las acciones de la página llevan al formulario con "Centro educativo" marcado
 const contactoCentro = { name: 'contacto', query: { tipo: 'centro' } }
 
-// Textos de la cabecera editables desde el panel de gestión web (config/cms_paginas.php → centros)
+// Textos editables desde el panel de gestión web (config/cms_paginas.php → centros)
 const p = usePagina('centros', { titulo: 'Centros Educativos' })
 const heroB1 = computed(() => p.boton('hero.boton_principal', { texto: 'Registrar mi centro', to: contactoCentro }))
 const heroB2 = computed(() => p.boton('hero.boton_secundario', { texto: 'Solicitar demo', to: contactoCentro }))
+
+const enlaceTarjetas  = computed(() => p.boton('casos.enlace_tarjetas', { texto: 'Ver caso', to: contactoCentro }))
+const resultadosBoton = computed(() => p.boton('resultados.boton', { texto: 'Ver más casos de éxito', to: { name: 'noticias' } }))
+const preguntasBoton  = computed(() => p.boton('preguntas.boton', { texto: 'Hacer otra pregunta', to: contactoCentro }))
 
 const faqAbierta = ref(null)
 
@@ -394,6 +397,37 @@ const faqs = [
   { q: '¿Podemos utilizar DuaLab en distintos ciclos y familias profesionales?',
     a: 'Sí. DuaLab trabaja con todas las familias profesionales, así que un mismo centro puede gestionar varios ciclos desde un único entorno.' },
 ]
+
+// Las listas con los textos del panel: iconos, colores e imágenes siguen en los
+// arrays de arriba; solo se sustituyen los textos (item_N_titulo / item_N_texto).
+const ventajasTextos = computed(() => ventajas.map((v, i) => ({
+  ...v,
+  title: p.t(`ventajas.item_${i + 1}_titulo`, v.title),
+  desc: p.t(`ventajas.item_${i + 1}_texto`, v.desc),
+})))
+const plataformaTextos = computed(() => plataforma.map((item, i) => ({
+  ...item,
+  label: p.t(`plataforma.item_${i + 1}_titulo`, item.label),
+})))
+const pasosTextos = computed(() => pasos.map((paso, i) => ({
+  ...paso,
+  title: p.t(`pasos.item_${i + 1}_titulo`, paso.title),
+  desc: p.t(`pasos.item_${i + 1}_texto`, paso.desc),
+})))
+const casosTextos = computed(() => casos.map((c, i) => ({
+  ...c,
+  title: p.t(`casos.item_${i + 1}_titulo`, c.title),
+  desc: p.t(`casos.item_${i + 1}_texto`, c.desc),
+})))
+// En las cifras la «cifra» va en item_N_cifra y la frase en item_N_texto
+const resultadosTextos = computed(() => resultados.map((r, i) => ({
+  valor: p.t(`resultados.item_${i + 1}_cifra`, r.valor),
+  texto: p.t(`resultados.item_${i + 1}_texto`, r.texto),
+})))
+const faqsTextos = computed(() => faqs.map((f, i) => ({
+  q: p.t(`preguntas.item_${i + 1}_titulo`, f.q),
+  a: p.t(`preguntas.item_${i + 1}_texto`, f.a),
+})))
 </script>
 
 <style scoped>

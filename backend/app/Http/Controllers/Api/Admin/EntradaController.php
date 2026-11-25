@@ -11,6 +11,7 @@ use App\Http\Requests\Admin\UpdateEntradaRequest;
 use App\Http\Resources\Admin\EntradaResource;
 use App\Models\Entrada;
 use App\Services\ActividadService;
+use App\Services\SeoService;
 use App\Services\EntradaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,9 +23,33 @@ class EntradaController extends Controller
 
     private const VERBOS_ESTADO = ['pendiente' => 'envió a revisión', 'publicada' => 'publicó', 'borrador' => 'pasó a borrador'];
 
-    private function registrar(Request $request, string $accion, string $verbo, Entrada $entrada): void
+    private function registrar(Request $request, string $accion, string $verbo, Entrada $entrada, ?array $detalle = null): void
     {
-        $this->actividad->registrar($request->user(), 'entradas', $accion, $verbo.' la entrada '.ActividadService::cita($entrada->titulo), 'entrada', $entrada->id);
+        $this->actividad->registrar($request->user(), 'entradas', $accion, $verbo.' la entrada '.ActividadService::cita($entrada->titulo), 'entrada', $entrada->id, $detalle);
+    }
+
+    private const ETIQUETAS = [
+        'titulo' => 'Título', 'slug' => 'Dirección (URL)', 'extracto' => 'Extracto', 'contenido' => 'Contenido',
+        'imagen_destacada' => 'Imagen destacada', 'categoria' => 'Categoría', 'estado' => 'Estado',
+        'publicada_en' => 'Fecha de publicación', 'destacada' => 'Destacada',
+    ];
+
+    /** Lo que se ve de la entrada, para el «antes → después» del historial. */
+    private function foto(Entrada $entrada): array
+    {
+        $entrada->loadMissing(['categoria', 'seo']);
+
+        return $entrada->only(['titulo', 'slug', 'extracto', 'contenido', 'imagen_destacada', 'estado', 'publicada_en', 'destacada'])
+            + ['categoria' => $entrada->categoria?->nombre]
+            + collect(SeoService::ETIQUETAS)->keys()->mapWithKeys(fn ($c) => ["seo.$c" => $entrada->seo?->$c])->all();
+    }
+
+    private function cambios(array $antes, Entrada $entrada): array
+    {
+        $etiquetas = self::ETIQUETAS + collect(SeoService::ETIQUETAS)->mapWithKeys(fn ($e, $c) => ["seo.$c" => $e])->all();
+
+        // El contenido es HTML largo: solo se apunta que cambió
+        return ActividadService::cambios($antes, $this->foto($entrada->fresh(['categoria', 'seo'])), $etiquetas, ['contenido']);
     }
 
     public function index(ListarEntradasRequest $request): AnonymousResourceCollection
@@ -73,9 +98,10 @@ class EntradaController extends Controller
     {
         $this->authorize('update', $entrada);
         $antes   = $entrada->estado;
+        $foto    = $this->foto($entrada);
         $entrada = $this->entradas->actualizar($entrada, $request->validated(), $request->user());
         $cambio  = $antes !== $entrada->estado;
-        $this->registrar($request, $cambio ? 'estado' : 'editar', $cambio ? self::VERBOS_ESTADO[$entrada->estado] : 'editó', $entrada);
+        $this->registrar($request, $cambio ? 'estado' : 'editar', $cambio ? self::VERBOS_ESTADO[$entrada->estado] : 'editó', $entrada, $this->cambios($foto, $entrada));
 
         return new EntradaResource($entrada->load(['categoria', 'seo']));
     }
@@ -125,7 +151,8 @@ class EntradaController extends Controller
         $this->authorize('aprobar', Entrada::class);
 
         $this->entradas->devolver($entrada, $request->validated('nota'));
-        $this->registrar($request, 'devolver', 'devolvió con una nota', $entrada);
+        $this->registrar($request, 'devolver', 'devolvió con una nota', $entrada,
+            [['campo' => 'Nota para el autor', 'antes' => null, 'despues' => ActividadService::texto($request->validated('nota'))]]);
 
         return new EntradaResource($entrada->load('categoria'));
     }

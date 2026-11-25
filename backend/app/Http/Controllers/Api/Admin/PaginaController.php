@@ -31,11 +31,15 @@ class PaginaController extends Controller
 
     public function update(UpdatePaginaRequest $request, string $clave): JsonResponse
     {
-        $this->paginas->guardar($clave, $request->validated(), $request->user());
         $idioma = $request->validated('idioma');
+        $antes  = $this->paginas->foto($clave, $idioma);
+        $this->paginas->guardar($clave, $request->validated(), $request->user());
+        $despues = $this->paginas->foto($clave, $idioma);
+
         $this->actividad->registrar($request->user(), 'paginas', 'editar',
             'editó la página '.ActividadService::cita(config('cms_paginas')[$clave]['titulo'] ?? $clave)
-            .($idioma !== Idioma::codigoPorDefecto() ? " ($idioma)" : ''), 'pagina', $clave);
+            .($idioma !== Idioma::codigoPorDefecto() ? " ($idioma)" : ''), 'pagina', $clave,
+            ActividadService::cambios($antes['valores'], $despues['valores'], $antes['etiquetas']));
 
         return response()->json($this->paginas->detalle($clave, $request->validated('idioma')));
     }

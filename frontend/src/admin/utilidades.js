@@ -38,3 +38,9 @@ export const ESTADOS_ENTRADA = {
   pendiente:  { nombre: 'Pendiente de aprobar', clase: 'bg-amber-50 text-amber-800' },
   borrador:   { nombre: 'Borrador',   clase: 'bg-gray-100 text-gray-700' },
 }
+
+// Chips por formulario / tipo de contacto (Formularios y remitentes conocidos en Correo)
+export const COLORES_FORMULARIO = {
+  rapido: 'bg-primary-100 text-primary-700', centro: 'bg-centros/10 text-centros', empresa: 'bg-empresas/10 text-[#3D7A1E]',
+  alumno: 'bg-alumnos/15 text-[#B85E0A]', administracion: 'bg-administraciones/10 text-[#0F7C7D]',
+}

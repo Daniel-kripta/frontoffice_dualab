@@ -70,7 +70,7 @@
   <!-- VENTAJAS -->
   <section class="bg-white py-14 px-6">
     <div v-reveal class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-0 lg:divide-x lg:divide-gray-100">
-      <div v-for="v in ventajas" :key="v.title" class="flex sm:flex-col gap-4 sm:gap-3 lg:px-5 lg:first:pl-0 lg:last:pr-0">
+      <div v-for="v in ventajasTextos" :key="v.title" class="flex sm:flex-col gap-4 sm:gap-3 lg:px-5 lg:first:pl-0 lg:last:pr-0">
         <span class="w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0" :class="v.bg">
           <component :is="v.icon" class="w-6 h-6" />
         </span>
@@ -93,29 +93,28 @@
             <ChartBarIcon class="w-6 h-6" />
           </span>
           <div class="min-w-0">
-            <p class="font-heading font-extrabold text-2xl text-azul-noche leading-none">{{ destacado.valor }}</p>
-            <p class="text-xs text-gray-500 mt-1">{{ destacado.texto }}</p>
+            <p class="font-heading font-extrabold text-2xl text-azul-noche leading-none">{{ p.t('plataforma.cifra_valor', destacado.valor) }}</p>
+            <p class="text-xs text-gray-500 mt-1">{{ p.t('plataforma.cifra_texto', destacado.texto) }}</p>
           </div>
         </div>
       </div>
 
       <div v-reveal="150">
-        <p class="section-eyebrow">Una plataforma al servicio del territorio</p>
+        <p class="section-eyebrow">{{ p.t('plataforma.antetitulo', 'Una plataforma al servicio del territorio') }}</p>
         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">
-          Todo lo que necesitas para gestionar la <span class="text-primary-500">Formación Dual</span>
+          {{ p.t('plataforma.titulo', 'Todo lo que necesitas para gestionar la') }} <span class="text-primary-500">{{ p.t('plataforma.destacado', 'Formación Dual') }}</span>
         </h2>
         <p class="text-gray-500 leading-relaxed mt-5">
-          DuaLab facilita a las administraciones la planificación, coordinación y evaluación de los programas de
-          Formación Dual, con información actualizada, trazabilidad y métricas de impacto.
+          {{ p.t('plataforma.descripcion', 'DuaLab facilita a las administraciones la planificación, coordinación y evaluación de los programas de Formación Dual, con información actualizada, trazabilidad y métricas de impacto.') }}
         </p>
         <ul class="mt-6 grid sm:grid-cols-2 gap-3">
-          <li v-for="p in plataforma" :key="p.title" class="bg-white rounded-2xl p-4 flex items-start gap-3 shadow-[0_2px_12px_rgba(23,40,62,0.05)]">
-            <span class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" :class="p.soft">
-              <component :is="p.icon" class="w-5 h-5" />
+          <li v-for="item in plataformaTextos" :key="item.title" class="bg-white rounded-2xl p-4 flex items-start gap-3 shadow-[0_2px_12px_rgba(23,40,62,0.05)]">
+            <span class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" :class="item.soft">
+              <component :is="item.icon" class="w-5 h-5" />
             </span>
             <div class="min-w-0">
-              <p class="font-heading font-bold text-sm text-azul-noche leading-snug">{{ p.title }}</p>
-              <p class="text-xs text-gray-500 leading-snug mt-0.5">{{ p.desc }}</p>
+              <p class="font-heading font-bold text-sm text-azul-noche leading-snug">{{ item.title }}</p>
+              <p class="text-xs text-gray-500 leading-snug mt-0.5">{{ item.desc }}</p>
             </div>
           </li>
         </ul>
@@ -127,13 +126,13 @@
   <section class="bg-white py-20 px-6">
     <div class="max-w-6xl mx-auto">
       <div v-reveal class="mb-10">
-        <p class="section-eyebrow">Beneficios para las administraciones</p>
+        <p class="section-eyebrow">{{ p.t('beneficios.antetitulo', 'Beneficios para las administraciones') }}</p>
         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">
-          Más FP Dual, más talento, <span class="text-primary-500">más territorio</span>
+          {{ p.t('beneficios.titulo', 'Más FP Dual, más talento,') }} <span class="text-primary-500">{{ p.t('beneficios.destacado', 'más territorio') }}</span>
         </h2>
       </div>
       <div v-reveal="100" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div v-for="b in beneficios" :key="b.title" class="bg-superficie rounded-2xl p-5">
+        <div v-for="b in beneficiosTextos" :key="b.title" class="bg-superficie rounded-2xl p-5">
           <span class="w-11 h-11 rounded-full flex items-center justify-center text-white shrink-0" :class="b.bg">
             <component :is="b.icon" class="w-5 h-5" />
           </span>
@@ -148,16 +147,16 @@
   <section class="bg-superficie py-20 px-6">
     <div class="max-w-6xl mx-auto">
       <div v-reveal class="mb-10">
-        <p class="section-eyebrow">Cómo funciona</p>
+        <p class="section-eyebrow">{{ p.t('como_funciona.antetitulo', 'Cómo funciona') }}</p>
         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">
-          Implanta y gestiona tus programas en <span class="text-primary-500">4 pasos</span>
+          {{ p.t('como_funciona.titulo', 'Implanta y gestiona tus programas en') }} <span class="text-primary-500">{{ p.t('como_funciona.destacado', '4 pasos') }}</span>
         </h2>
       </div>
       <ol v-reveal="100" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <li v-for="(p, i) in pasos" :key="p.title"
+        <li v-for="(item, i) in pasosTextos" :key="item.title"
             class="bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(23,40,62,0.05)]">
           <div class="flex items-center gap-3">
-            <span class="w-11 h-11 rounded-full flex items-center justify-center text-white font-heading font-black text-lg shadow-md shrink-0" :class="p.bg">
+            <span class="w-11 h-11 rounded-full flex items-center justify-center text-white font-heading font-black text-lg shadow-md shrink-0" :class="item.bg">
               {{ i + 1 }}
             </span>
             <!-- Conector hacia el siguiente paso (solo en fila completa) -->
@@ -166,18 +165,18 @@
               <ArrowRightIcon class="w-4 h-4 text-primary-400 -ml-1" />
             </span>
           </div>
-          <h3 class="font-heading font-bold text-azul-noche mt-4">{{ p.title }}</h3>
-          <p class="text-sm text-gray-500 leading-snug mt-1">{{ p.desc }}</p>
+          <h3 class="font-heading font-bold text-azul-noche mt-4">{{ item.title }}</h3>
+          <p class="text-sm text-gray-500 leading-snug mt-1">{{ item.desc }}</p>
         </li>
       </ol>
       <div v-reveal="150" class="flex flex-wrap gap-3 mt-10">
-        <RouterLink :to="contactoEntidad" class="btn-pill bg-administraciones hover:bg-administraciones/90 px-8">
-          Agenda una reunión
-        </RouterLink>
-        <RouterLink :to="contactoEntidad" class="btn-pill-outline">
-          Solicitar demo
+        <EnlaceCms :to="pasosB1.to" class="btn-pill bg-administraciones hover:bg-administraciones/90 px-8">
+          {{ pasosB1.texto }}
+        </EnlaceCms>
+        <EnlaceCms :to="pasosB2.to" class="btn-pill-outline">
+          {{ pasosB2.texto }}
           <ArrowRightIcon class="w-4 h-4" />
-        </RouterLink>
+        </EnlaceCms>
       </div>
     </div>
   </section>
@@ -234,10 +233,12 @@ const router = useRouter()
 // Todas las acciones de la página llevan al formulario con "Entidad / Administración" marcado
 const contactoEntidad = { name: 'contacto', query: { tipo: 'administracion' } }
 
-// Textos de la cabecera editables desde el panel de gestión web (config/cms_paginas.php → entidades)
+// Textos editables desde el panel de gestión web (config/cms_paginas.php → entidades)
 const p = usePagina('entidades', { titulo: 'Instituciones y administraciones' })
 const heroB1 = computed(() => p.boton('hero.boton_principal', { texto: 'Contáctanos', to: contactoEntidad }))
 const heroB2 = computed(() => p.boton('hero.boton_secundario', { texto: 'Solicitar demo', to: contactoEntidad }))
+const pasosB1 = computed(() => p.boton('como_funciona.boton_principal', { texto: 'Agenda una reunión', to: contactoEntidad }))
+const pasosB2 = computed(() => p.boton('como_funciona.boton_secundario', { texto: 'Solicitar demo', to: contactoEntidad }))
 
 // ── Data ───────────────────────────────────────────────────────────────────────
 const ventajas = [
@@ -286,9 +287,22 @@ const pasos = [
   { title: 'Analiza el impacto',           bg: 'bg-administraciones', desc: 'Accede a informes y métricas para la toma de decisiones.' },
 ]
 
+// Las listas, con sus textos del panel (iconos y colores se quedan aquí;
+// item_N_titulo / item_N_texto siguen el orden de cada lista)
+const conTextos = (lista, seccion) => computed(() => lista.map((item, i) => ({
+  ...item,
+  title: p.t(`${seccion}.item_${i + 1}_titulo`, item.title),
+  desc: p.t(`${seccion}.item_${i + 1}_texto`, item.desc),
+})))
+const ventajasTextos   = conTextos(ventajas, 'ventajas')
+const plataformaTextos = conTextos(plataforma, 'plataforma')
+const beneficiosTextos = conTextos(beneficios, 'beneficios')
+const pasosTextos      = conTextos(pasos, 'como_funciona')
+
 // PENDIENTE DE CONFIRMAR: cifra tomada tal cual de la maqueta
 // DuaLab_Web_Administraciones. Sustituir por un dato real con fuente antes
-// de publicar en producción (o quitar la tarjeta).
+// de publicar en producción (o quitar la tarjeta). Editable en el panel:
+// plataforma.cifra_valor / plataforma.cifra_texto.
 const destacado = { valor: '+40%', texto: 'de empleabilidad en territorios con FP Dual' }
 </script>
 

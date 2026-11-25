@@ -20,8 +20,8 @@
 
   <section class="bg-gray-50 py-14 px-6">
     <div class="max-w-5xl mx-auto">
-      <h2 class="text-lg font-bold text-azul-noche mb-1">Familias Profesionales</h2>
-      <p class="text-sm text-gray-500 mb-8">Explora los retos organizados por áreas de conocimiento</p>
+      <h2 class="text-lg font-bold text-azul-noche mb-1">{{ p.t('listado.titulo', 'Familias Profesionales') }}</h2>
+      <p class="text-sm text-gray-500 mb-8">{{ p.t('listado.descripcion', 'Explora los retos organizados por áreas de conocimiento') }}</p>
 
       <p v-if="loading" class="text-gray-400 text-sm">Cargando…</p>
       <p v-else-if="loadError" class="text-gray-500 text-sm">
@@ -48,8 +48,8 @@
 
       <!-- Más familias en camino -->
       <div class="mt-14 rounded-2xl bg-primary-50 border border-primary-100 p-8">
-        <h2 class="text-lg font-bold text-azul-noche">Más familias <span class="text-primary-600">próximamente</span></h2>
-        <p class="text-sm text-gray-500 mt-1 mb-6">Estamos trabajando para traerte más familias profesionales.</p>
+        <h2 class="text-lg font-bold text-azul-noche">{{ p.t('proximamente.titulo', 'Más familias') }} <span class="text-primary-600">{{ p.t('proximamente.destacado', 'próximamente') }}</span></h2>
+        <p class="text-sm text-gray-500 mt-1 mb-6">{{ p.t('proximamente.descripcion', 'Estamos trabajando para traerte más familias profesionales.') }}</p>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
           <FamiliaCard v-for="f in familiasProximamente" :key="f.slug"
                        :nombre="f.nombre" :icon="familiaIcon(f.nombre)" proximamente />
@@ -85,6 +85,6 @@ onMounted(async () => {
 })
 
 
-// Cabecera editable desde el panel de gestión web (config/cms_paginas.php → familias)
+// Textos editables desde el panel de gestión web (config/cms_paginas.php → familias)
 const p = usePagina('familias', { titulo: 'Familias Profesionales' })
 </script>

@@ -23,23 +23,19 @@
           </button>
 
           <div class="text-center mb-10">
-            <p class="section-eyebrow">Flujo de trabajo</p>
-            <h2 id="como-funciona-title" class="text-3xl font-extrabold tracking-tight text-azul-noche">¿Cómo funciona DuaLab?</h2>
-            <p class="text-gray-500 mt-2 text-sm font-medium">Tres pasos para transformar necesidades reales en aprendizaje práctico</p>
+            <p class="section-eyebrow">{{ t.antetitulo }}</p>
+            <h2 id="como-funciona-title" class="text-3xl font-extrabold tracking-tight text-azul-noche">{{ t.titulo }}</h2>
+            <p class="text-gray-500 mt-2 text-sm font-medium">{{ t.descripcion }}</p>
           </div>
 
           <div class="grid md:grid-cols-3 gap-4">
-            <StepCard number="1" :icon="BuildingOffice2Icon" title="La Empresa propone"
-              desc="Identifican una fricción o cuello de botella real en su día a día." />
-            <StepCard number="2" :icon="SparklesIcon" title="La IA lo transforma"
-              desc="DuaLab genera un reto académico alineado al currículo oficial." />
-            <StepCard number="3" :icon="AcademicCapIcon" title="El Alumnado resuelve"
-              desc="Ganan experiencia práctica mientras aportan valor real a la empresa." />
+            <StepCard v-for="(paso, i) in t.pasos" :key="i" :number="String(i + 1)" :icon="ICONOS_PASOS[i]"
+              :title="paso.titulo" :desc="paso.texto" />
           </div>
 
           <div class="text-center mt-10">
             <button type="button" class="btn-pill bg-primary-600 hover:bg-primary-700 px-8" @click="$emit('demo')">
-              Solicitar demo
+              {{ t.boton }}
             </button>
           </div>
         </div>
@@ -49,11 +45,27 @@
 </template>
 
 <script setup>
-import { watch, onUnmounted } from 'vue'
+import { computed, watch, onUnmounted } from 'vue'
 import StepCard from '@/components/home/StepCard.vue'
 import { BuildingOffice2Icon, SparklesIcon, AcademicCapIcon } from '@heroicons/vue/24/outline'
 
-const props = defineProps({ open: Boolean })
+// textos: { antetitulo, titulo, descripcion, pasos: [{ titulo, texto }] ×3, boton }; los pasa
+// la vista (editables desde el panel de gestión web). Lo que falte se queda con el original.
+const ORIGINALES = {
+  antetitulo: 'Flujo de trabajo',
+  titulo: '¿Cómo funciona DuaLab?',
+  descripcion: 'Tres pasos para transformar necesidades reales en aprendizaje práctico',
+  pasos: [
+    { titulo: 'La Empresa propone', texto: 'Identifican una fricción o cuello de botella real en su día a día.' },
+    { titulo: 'La IA lo transforma', texto: 'DuaLab genera un reto académico alineado al currículo oficial.' },
+    { titulo: 'El Alumnado resuelve', texto: 'Ganan experiencia práctica mientras aportan valor real a la empresa.' },
+  ],
+  boton: 'Solicitar demo',
+}
+const ICONOS_PASOS = [BuildingOffice2Icon, SparklesIcon, AcademicCapIcon]
+
+const props = defineProps({ open: Boolean, textos: { type: Object, default: () => ({}) } })
+const t = computed(() => ({ ...ORIGINALES, ...props.textos }))
 const emit = defineEmits(['close', 'demo'])
 
 function handleKeydown(e) {

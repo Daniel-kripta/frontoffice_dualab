@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Entrada;
+use App\Models\Redireccion;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -39,11 +40,19 @@ class EntradaService
         return DB::transaction(function () use ($entrada, $datos, $usuario) {
             $entrada->fill($this->preparar($datos, $entrada));
 
+            // ¿Estaba en la web? Entonces su dirección antigua ya la conocen Google y las IA
+            $eraVisible = $entrada->getOriginal('estado') === 'publicada' && $entrada->getOriginal('publicada_en')?->isPast();
+            $slugAnterior = $entrada->getOriginal('slug');
+
             if (array_key_exists('slug', $datos) || $entrada->isDirty('titulo') && $entrada->estado === 'borrador') {
                 $entrada->slug = $this->slugUnico($datos['slug'] ?? null, $entrada->titulo, $entrada->idioma, $entrada->id);
             }
             $this->registrarCambioDeEstado($entrada, $usuario);
             $entrada->save();
+
+            if ($eraVisible && $slugAnterior && $slugAnterior !== $entrada->slug) {
+                $this->redirigir($entrada->idioma, "/noticias/$slugAnterior", "/noticias/{$entrada->slug}");
+            }
 
             if (isset($datos['seo'])) {
                 $this->seo->guardar($entrada, $entrada->idioma, $datos['seo']);
@@ -51,6 +60,14 @@ class EntradaService
 
             return $entrada;
         });
+    }
+
+    /** La dirección antigua lleva a la nueva (301), sin cadenas ni bucles si se vuelve a cambiar. */
+    private function redirigir(string $idioma, string $origen, string $destino): void
+    {
+        Redireccion::where('idioma', $idioma)->where('origen', $destino)->delete();
+        Redireccion::where('idioma', $idioma)->where('destino', $origen)->update(['destino' => $destino]);
+        Redireccion::updateOrCreate(['idioma' => $idioma, 'origen' => $origen], ['destino' => $destino]);
     }
 
     /** Aprobar: se publica (ahora o en su fecha programada). */

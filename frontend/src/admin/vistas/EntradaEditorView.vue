@@ -3,6 +3,7 @@
     <a v-if="entrada?.estado === 'publicada' && !hayCambios" :href="`/noticias/${entrada.slug}`" target="_blank" rel="noopener" class="gw-accion-secundaria">
       <ArrowTopRightOnSquareIcon class="h-4 w-4" aria-hidden="true" /> Ver en la web
     </a>
+    <ComoNosVen v-if="entrada?.estado === 'publicada' && !hayCambios" :ruta="`/noticias/${entrada.slug}`" :idioma="entrada.idioma" />
   </CabeceraPanel>
 
   <div v-if="error" class="gw-tarjeta p-6 text-center">
@@ -167,6 +168,7 @@ import { ArrowTopRightOnSquareIcon, CheckIcon } from '@heroicons/vue/24/outline'
 import CabeceraPanel from '../componentes/CabeceraPanel.vue'
 import EditorRico from '../componentes/EditorRico.vue'
 import CajaSeo from '../componentes/CajaSeo.vue'
+import ComoNosVen from '../componentes/ComoNosVen.vue'
 import HistorialActividad from '../componentes/HistorialActividad.vue'
 import CampoImagen from '../componentes/CampoImagen.vue'
 import { entradasService } from '@/services/admin/entradasService'

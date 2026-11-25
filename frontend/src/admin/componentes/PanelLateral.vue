@@ -1,5 +1,6 @@
 <!-- Menú lateral del panel de gestión web: mismo lenguaje que el SidePanel de la app
-     DuaLab (azul noche, entradas .nav-item, activo en turquesa del rol admin) y la
+     DuaLab (entradas .nav-item, activo en turquesa del rol admin) sobre un turquesa muy oscuro
+     a juego con el icono de Gestión web (antes azul noche) y la
      estructura de WordPress (secciones con submenú desplegado en la sección activa). -->
 <template>
   <Transition name="gw-fade">
@@ -8,7 +9,7 @@
 
   <aside
     id="gw-menu"
-    class="fixed bottom-0 left-0 top-16 z-40 flex w-72 max-w-[85vw] flex-col border-r border-azul-noche-border bg-azul-noche
+    class="fixed bottom-0 left-0 top-16 z-40 flex w-72 max-w-[85vw] flex-col border-r border-white/10 bg-[#0E3233]
            shadow-[6px_0_32px_rgba(0,0,0,0.25)] transition-transform duration-300 lg:translate-x-0"
     :class="abierto ? 'translate-x-0' : '-translate-x-full'"
     aria-label="Menú del panel"
@@ -18,15 +19,22 @@
         <p v-if="grupo.titulo" class="nav-grupo">{{ grupo.titulo }}</p>
         <ul class="space-y-0.5">
           <li v-for="item in grupo.items" :key="item.label">
-            <RouterLink :to="item.to" class="nav-item" :class="activo(item) ? 'nav-item--activo' : 'nav-item--reposo'"
+            <!-- Enlace a otra herramienta (p. ej. DuaLab Central): se abre en otra pestaña -->
+            <a v-if="item.href" :href="item.href" target="_blank" rel="noopener" class="nav-item nav-item--reposo">
+              <component :is="item.icono" class="h-5 w-5 shrink-0" aria-hidden="true" />
+              <span class="min-w-0 flex-1">
+                <span class="block truncate">{{ item.label }}</span>
+                <span v-if="item.equivalente" class="block truncate text-xs font-medium opacity-60">{{ item.equivalente }}</span>
+              </span>
+              <ArrowTopRightOnSquareIcon class="h-4 w-4 shrink-0 opacity-60" aria-hidden="true" />
+              <span class="sr-only">(se abre en otra pestaña)</span>
+            </a>
+            <RouterLink v-else :to="item.to" class="nav-item" :class="activo(item) ? 'nav-item--activo' : 'nav-item--reposo'"
                         :aria-current="activo(item) ? 'page' : undefined">
               <component :is="item.icono" class="h-5 w-5 shrink-0" aria-hidden="true" />
               <span class="min-w-0 flex-1">
                 <span class="block truncate">{{ item.label }}</span>
                 <span v-if="item.equivalente" class="block truncate text-xs font-medium opacity-60">antes: {{ item.equivalente }}</span>
-              </span>
-              <span v-if="item.badge === 'formularios' && nuevos" class="nav-badge" :aria-label="`${nuevos} formularios nuevos`">
-                {{ nuevos > 99 ? '99+' : nuevos }}
               </span>
             </RouterLink>
             <!-- Submenú (como en WordPress): visible cuando la sección está activa -->
@@ -44,7 +52,7 @@
 
       <!-- Banner de marca al fondo, como en la app -->
       <div class="mt-auto pt-4 [@media(max-height:640px)]:hidden" aria-hidden="true">
-        <div class="relative h-24 overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-[#2E5F8F] via-[#24486E] to-[#1B3553] px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.25)]">
+        <div class="relative h-24 overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-[#0F7C7D] via-[#0B5F60] to-[#083F40] px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.25)]">
           <svg class="absolute inset-x-0 bottom-0 h-12 w-full" viewBox="0 0 240 48" preserveAspectRatio="none">
             <path d="M0 30 C60 14 120 46 240 22 V48 H0Z" fill="#FF8920" opacity="0.85" />
             <path d="M0 38 C70 26 140 50 240 34 V48 H0Z" fill="#3FC7C8" opacity="0.9" />
@@ -60,12 +68,12 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { ArrowTopRightOnSquareIcon } from '@heroicons/vue/24/outline'
 import logo from '@/assets/logo_colores.png'
 import { GRUPOS_PANEL } from '../navegacion'
 import { usePanelSesion } from '@/stores/panelSesion'
-import { formulariosService } from '@/services/admin/formulariosService'
 
 defineProps({ abierto: { type: Boolean, default: false } })
 defineEmits(['cerrar'])
@@ -77,20 +85,7 @@ const grupos = computed(() => GRUPOS_PANEL
   .map(g => ({ ...g, items: g.items.filter(i => sesion.puede(i.roles)) }))
   .filter(g => g.items.length))
 
-const activo = item => (item.exacta ? route.path === '/gestion-web' || route.path === '/gestion-web/' : route.path.startsWith(item.prefijo))
-
-// Contador de formularios nuevos: al navegar, como mucho cada 30 s
-const nuevos = ref(0)
-let ultima = 0
-async function refrescarNuevos() {
-  if (Date.now() - ultima < 30000) return
-  ultima = Date.now()
-  try {
-    const r = await formulariosService.listar({ estado: 'nuevo', per_page: 1 })
-    nuevos.value = r.meta.total
-  } catch { /* el contador no es crítico */ }
-}
-watch(() => route.fullPath, refrescarNuevos, { immediate: true })
+const activo = item => !item.href && (item.exacta ? route.path === '/gestion-web' || route.path === '/gestion-web/' : route.path.startsWith(item.prefijo))
 </script>
 
 <style scoped>

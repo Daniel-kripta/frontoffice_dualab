@@ -23,7 +23,46 @@ class EnviarFormularioAWebhook implements ShouldQueue
 
     public array $backoff = [60, 300];
 
-    public function __construct(public Contacto $contacto) {}
+    // 'webhook': la app DuaLab (captaciones en Central), configurada en el servidor (services.app_dualab).
+    // 'crm': CRM externo opcional, configurado en el panel (integraciones.crm_*).
+    public const DESTINOS = ['webhook', 'crm'];
+
+    public function __construct(public Contacto $contacto, public string $destino = 'webhook') {}
+
+    /**
+     * Dirección y clave de un destino, o null si no está configurado (o, el CRM, desactivado).
+     * La app: del .env; mientras no esté, lo que se guardó en el panel cuando se configuraba allí.
+     *
+     * @return array{url: string, secreto: ?string}|null
+     */
+    public static function destino(string $destino, bool $soloActivo = true): ?array
+    {
+        if ($destino === 'webhook') {
+            $url = config('services.app_dualab.webhook_url');
+            $secreto = config('services.app_dualab.webhook_secreto');
+            if (! $url && Ajuste::leer('integraciones.webhook_activo')) {
+                [$url, $secreto] = [Ajuste::leer('integraciones.webhook_url'), Ajuste::leer('integraciones.webhook_secreto')];
+            }
+
+            return $url ? ['url' => $url, 'secreto' => $secreto ?: null] : null;
+        }
+        if ($destino === 'crm') {
+            $url = Ajuste::leer('integraciones.crm_url');
+            if (! $url || ($soloActivo && ! Ajuste::leer('integraciones.crm_activo'))) {
+                return null;
+            }
+
+            return ['url' => $url, 'secreto' => Ajuste::leer('integraciones.crm_secreto')];
+        }
+
+        return null;
+    }
+
+    /** Destinos a los que avisar: a cada uno se le manda su propio aviso (y sus reintentos). */
+    public static function destinosActivos(): array
+    {
+        return array_values(array_filter(self::DESTINOS, fn ($d) => self::destino($d) !== null));
+    }
 
     public static function payload(Contacto $c): array
     {
@@ -47,13 +86,13 @@ class EnviarFormularioAWebhook implements ShouldQueue
 
     public function handle(): void
     {
-        $url = Ajuste::leer('integraciones.webhook_url');
-        if (! $url || ! Ajuste::leer('integraciones.webhook_activo')) {
+        $destino = self::destino($this->destino);
+        if (! $destino) {
             return;
         }
+        ['url' => $url, 'secreto' => $secreto] = $destino;
 
-        $cuerpo  = json_encode(self::payload($this->contacto), JSON_UNESCAPED_UNICODE);
-        $secreto = Ajuste::leer('integraciones.webhook_secreto');
+        $cuerpo = json_encode(self::payload($this->contacto), JSON_UNESCAPED_UNICODE);
 
         Http::timeout(10)
             ->withHeaders(array_filter([

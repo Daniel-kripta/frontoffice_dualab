@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\EntradaResource;
-use App\Http\Resources\Admin\FormularioResource;
 use App\Models\Ajuste;
-use App\Models\Contacto;
 use App\Models\Entrada;
 use App\Models\Idioma;
 use App\Models\Medio;
@@ -19,11 +17,7 @@ class EscritorioController extends Controller
     public function __invoke(): JsonResponse
     {
         return response()->json([
-            'formularios' => [
-                'nuevos'  => Contacto::where('estado', 'nuevo')->count(),
-                'semana'  => Contacto::where('created_at', '>=', now()->subDays(7))->count(),
-                'ultimos' => FormularioResource::collection(Contacto::latest()->take(5)->get()),
-            ],
+            // Sin formularios: se atienden en DuaLab Central («Primer contacto»), no en Gestión web
             'entradas' => [
                 'publicadas' => Entrada::visibles()->count(),
                 'borradores' => Entrada::where('estado', 'borrador')->count(),

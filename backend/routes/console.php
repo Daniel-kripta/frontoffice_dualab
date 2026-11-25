@@ -18,5 +18,9 @@ Schedule::command('queue:work --stop-when-empty --tries=3 --max-time=50')
     ->everyMinute()
     ->withoutOverlapping();
 
-// Registro de actividad del panel de gestión web: se guarda 2 años (ActividadPanel::prunable)
-Schedule::command('model:prune', ['--model' => [\App\Models\ActividadPanel::class]])->daily();
+// Registro de actividad del panel de gestión web: se guarda 2 años (ActividadPanel::prunable).
+// Copia del correo: 4 meses (CorreoMensaje::prunable); el original sigue en Hostinger.
+Schedule::command('model:prune', ['--model' => [\App\Models\ActividadPanel::class, \App\Models\CorreoMensaje::class, \App\Models\CorreoEnvio::class]])->daily();
+
+// Bandeja de Correo del panel: copia lo nuevo de info@ (IMAP) cada 2 minutos
+Schedule::command('correo:sincronizar')->everyTwoMinutes()->withoutOverlapping(10);

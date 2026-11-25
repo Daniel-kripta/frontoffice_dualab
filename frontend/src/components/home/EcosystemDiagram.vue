@@ -28,7 +28,7 @@
       </div>
 
       <div
-        v-for="a in agents"
+        v-for="a in agentesVista"
         :key="a.key"
         class="min-w-0 flex flex-col items-center text-center gap-3 md:gap-4"
         :class="[a.position, a.side === 'left' ? 'md:flex-row-reverse md:text-right' : 'md:flex-row md:text-left']"
@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   AcademicCapIcon,
   BuildingOffice2Icon,
@@ -87,6 +87,15 @@ const agents = [
     position: 'md:col-start-3 md:row-start-2 md:items-center',
   },
 ]
+
+// textos: [{ titulo, texto }] en el orden de `agents`; los pasa la vista (editables desde
+// el panel de gestión web). Si falta alguno se usa el texto original.
+const props = defineProps({ textos: { type: Array, default: () => [] } })
+const agentesVista = computed(() => agents.map((a, i) => ({
+  ...a,
+  label: props.textos[i]?.titulo || a.label,
+  desc: props.textos[i]?.texto || a.desc,
+})))
 
 // Proporción anillo interior / exterior (antes 260px / 400px).
 const INNER_RATIO = 0.65

@@ -20,7 +20,7 @@
         :class="theme.link"
         @click="$emit('more')"
       >
-        Más información
+        {{ textoBoton }}
         <svg class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M13 6l6 6-6 6" />
         </svg>
@@ -40,8 +40,10 @@ const THEMES = {
   administraciones: { bg: 'bg-administraciones', link: 'text-administraciones hover:text-azul-noche' },
 }
 
+// textoBoton: lo pasa la vista (editable desde el panel de gestión web)
 const props = defineProps({
   title: String, desc: String, image: String, bullets: Array,
+  textoBoton: { type: String, default: 'Más información' },
   color: { type: String, default: 'centros', validator: (v) => ['centros', 'empresas', 'alumnos', 'administraciones'].includes(v) },
 })
 defineEmits(['more'])

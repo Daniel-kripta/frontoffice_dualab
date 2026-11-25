@@ -46,6 +46,34 @@ return [
             'HTML.TargetNoreferrer'    => true,
             'AutoFormat.RemoveEmpty'   => true,
         ],
+        // Correos recibidos (bandeja de Correo del panel). Más amplio que `cms` porque los correos
+        // se maquetan con tablas y estilos en línea, pero sin scripts, formularios, iframes ni
+        // <style>. El panel además los muestra en un iframe aislado con CSP que bloquea las
+        // imágenes externas hasta que se pide verlas (píxeles de seguimiento).
+        'correo' => [
+            'HTML.Doctype'             => 'XHTML 1.0 Transitional',
+            'HTML.Allowed'             => 'div[style|align],span[style],p[style|align],br,hr,center,font[color|size|face],'
+                                        .'h1[style],h2[style],h3[style],h4[style],h5[style],h6[style],'
+                                        .'strong,b,em,i,u,s,strike,sub,sup,small,big,blockquote[style],pre,code,'
+                                        .'a[href|title|style],ul[style],ol[style],li[style],dl,dt,dd,'
+                                        .'img[src|alt|width|height|style|border],'
+                                        .'table[style|width|border|cellpadding|cellspacing|align|bgcolor],thead,tbody,tfoot,'
+                                        .'tr[style|align|valign|bgcolor],'
+                                        .'td[style|width|height|colspan|rowspan|align|valign|bgcolor],'
+                                        .'th[style|width|colspan|rowspan|align|valign|bgcolor]',
+            'CSS.AllowedProperties'    => 'font,font-size,font-weight,font-style,font-family,line-height,color,background-color,'
+                                        .'text-align,text-decoration,vertical-align,width,max-width,height,'
+                                        .'margin,margin-top,margin-bottom,margin-left,margin-right,'
+                                        .'padding,padding-top,padding-bottom,padding-left,padding-right,'
+                                        .'border,border-top,border-bottom,border-left,border-right,border-collapse,'
+                                        // Correos con diseño de la app (franjas de color, cabecera). Solo propiedades que
+                                        // HTMLPurifier conoce: con una desconocida avisa y la limpieza falla para todos
+                                        .'background,letter-spacing,white-space',
+            'URI.AllowedSchemes'       => ['http' => true, 'https' => true, 'mailto' => true, 'tel' => true],
+            'HTML.TargetBlank'         => true,
+            'HTML.TargetNoopener'      => true,
+            'HTML.TargetNoreferrer'    => true,
+        ],
         'test'    => [
             'Attr.EnableID' => 'true',
         ],

@@ -24,7 +24,7 @@ class User extends Authenticatable
         'ultimo_acceso_en'   => 'datetime',
     ];
 
-    /** Rol del panel de gestión web (admin, editor, contactos) */
+    /** Rol del panel de gestión web (admin, editor) */
     public function esDelPanel(): bool
     {
         return in_array($this->role, config('cms.roles_panel'), true);

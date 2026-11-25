@@ -1,12 +1,12 @@
-import { CONTACTOS, CONTENIDO, SOLO_ADMIN } from './roles'
+import { CONTENIDO, SOLO_ADMIN } from './roles'
 import {
   ClipboardDocumentListIcon, UsersIcon,
   HomeIcon, DocumentDuplicateIcon, NewspaperIcon, PhotoIcon, InboxIcon,
-  LanguageIcon, MagnifyingGlassCircleIcon, ChartBarIcon, SwatchIcon,
+  LanguageIcon, MagnifyingGlassCircleIcon, ChartBarIcon, SwatchIcon, SparklesIcon,
 } from '@heroicons/vue/24/outline'
 
-// Menú lateral del panel: Escritorio, Contenido, Sitio web (aspecto global), Visibilidad (Google),
-// Contactos y Equipo. `roles`: quién lo ve (ver roles.js); el backend lo vuelve a comprobar. `equivalente`: el plugin de WordPress al que sustituye,
+// Menú lateral del panel: Escritorio, Contenido, Sitio web (aspecto global), Visibilidad (Google e IA),
+// Formularios y Equipo. `roles`: quién lo ve (ver roles.js); el backend lo vuelve a comprobar. `equivalente`: el plugin de WordPress al que sustituye,
 // para quien viene de WordPress.
 export const GRUPOS_PANEL = [
   {
@@ -41,27 +41,23 @@ export const GRUPOS_PANEL = [
     titulo: 'Visibilidad',
     items: [
       { label: 'SEO', to: { name: 'panel-seo' }, icono: MagnifyingGlassCircleIcon, prefijo: '/gestion-web/seo', equivalente: 'All in One SEO', roles: CONTENIDO },
+      { label: 'GEO (IA)', to: { name: 'panel-geo' }, icono: SparklesIcon, prefijo: '/gestion-web/geo', equivalente: 'llms.txt y Schema', roles: CONTENIDO },
       { label: 'Analítica', to: { name: 'panel-analitica' }, icono: ChartBarIcon, prefijo: '/gestion-web/analitica', equivalente: 'Site Kit', roles: SOLO_ADMIN },
     ],
   },
   {
-    titulo: 'Contactos',
+    // Los formularios y el correo de info@ se atienden en DuaLab Central («Primer contacto», enlazado
+    // desde la propia pantalla): aquí solo queda adónde se manda cada formulario (mailing y webhook)
+    titulo: 'Formularios',
     items: [
-      {
-        label: 'Formularios', to: { name: 'panel-formularios' }, icono: InboxIcon, prefijo: '/gestion-web/formularios',
-        equivalente: 'Flamingo', badge: 'formularios', roles: CONTACTOS,
-        hijos: [
-          { label: 'Recibidos', to: { name: 'panel-formularios' }, rutas: ['panel-formularios'], roles: CONTACTOS },
-          { label: 'Integraciones', to: { name: 'panel-integraciones' }, rutas: ['panel-integraciones'], roles: SOLO_ADMIN },
-        ],
-      },
+      { label: 'Mailing y webhook', to: { name: 'panel-integraciones' }, icono: InboxIcon, prefijo: '/gestion-web/formularios/integraciones', equivalente: 'Integraciones', roles: SOLO_ADMIN },
     ],
   },
   {
     titulo: 'Equipo',
     items: [
       { label: 'Usuarios', to: { name: 'panel-usuarios' }, icono: UsersIcon, prefijo: '/gestion-web/usuarios', roles: SOLO_ADMIN },
-      { label: 'Actividad', to: { name: 'panel-actividad' }, icono: ClipboardDocumentListIcon, prefijo: '/gestion-web/actividad', roles: SOLO_ADMIN },
+      { label: 'Historial', to: { name: 'panel-actividad' }, icono: ClipboardDocumentListIcon, prefijo: '/gestion-web/historial', roles: SOLO_ADMIN },
     ],
   },
 ]

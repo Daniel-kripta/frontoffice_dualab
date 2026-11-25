@@ -1,12 +1,17 @@
 <!-- Consentimiento de cookies analíticas. Solo aparece si en el panel de gestión web
      (Analítica) hay un ID de Google Analytics / Tag Manager y la analítica está activa;
-     los scripts de Google no se cargan hasta que el visitante acepta. -->
+     los scripts de Google no se cargan hasta que el visitante acepta. Se vuelve a abrir desde
+     «Configurar cookies» en el pie (useConsentimientoCookies) para cambiar o retirar la decisión. -->
 <template>
   <div v-if="visible" role="dialog" aria-modal="false" aria-labelledby="cookies-titulo"
        class="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-xl max-h-[70vh] overflow-y-auto rounded-2xl bg-azul-noche text-white shadow-2xl p-5 sm:inset-x-auto sm:right-5 sm:bottom-5">
     <p id="cookies-titulo" class="font-heading font-bold">Cookies de analítica</p>
     <p class="mt-2 text-sm text-white/85 leading-relaxed">
       Usamos cookies de Google Analytics para saber cómo se usa la web y mejorarla. Solo se activan si las aceptas.
+      Puedes cambiar tu decisión cuando quieras desde «Configurar cookies», al pie de la página.
+    </p>
+    <p v-if="reabierto && decision" class="mt-2 text-xs text-white/70">
+      Ahora mismo están {{ decision === 'aceptadas' ? 'aceptadas' : 'rechazadas' }}.
     </p>
     <div class="mt-4 flex flex-wrap gap-2">
       <button type="button" class="inline-flex h-10 items-center rounded-full bg-white px-5 text-sm font-bold text-azul-noche" @click="decidir('aceptadas')">Aceptar</button>
@@ -16,26 +21,14 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { useConfiguracionWeb } from '@/composables/useConfiguracionWeb'
+import { computed, watch } from 'vue'
 import { enVistaPrevia } from '@/composables/useApariencia'
+import { useConsentimientoCookies } from '@/composables/useConsentimientoCookies'
 
-const CLAVE = 'dualab_cookies_analitica' // decisión del visitante (no es un dato sensible)
-const { ajuste, cargada } = useConfiguracionWeb()
+const { decision, reabierto, ga4, gtm, hayAnalitica, decidir } = useConsentimientoCookies()
 
-function leer() { try { return localStorage.getItem(CLAVE) } catch { return null } }
-const decision = ref(leer())
-
-const ga4 = computed(() => ajuste('analitica.ga4_id'))
-const gtm = computed(() => ajuste('analitica.gtm_id'))
-const hayAnalitica = computed(() => cargada.value && ajuste('analitica.activa') === true && (ga4.value || gtm.value))
 // En la vista previa del panel no se pregunta (ni se carga analítica)
-const visible = computed(() => hayAnalitica.value && !decision.value && !enVistaPrevia)
-
-function decidir(valor) {
-  decision.value = valor
-  try { localStorage.setItem(CLAVE, valor) } catch { /* modo privado: se volverá a preguntar */ }
-}
+const visible = computed(() => hayAnalitica.value && (!decision.value || reabierto.value) && !enVistaPrevia)
 
 let cargado = false
 function cargarScripts() {

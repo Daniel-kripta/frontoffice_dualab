@@ -57,6 +57,7 @@ class UsuarioPanelService
         }
 
         $antes = $usuario->role;
+        $foto  = ['name' => $usuario->name, 'email' => $usuario->email, 'role' => $this->nombreRol($usuario->role)];
         $usuario->fill(array_intersect_key($datos, array_flip(['name', 'email'])));
         if (isset($datos['role'])) {
             $usuario->forceFill(['role' => $datos['role']]);
@@ -73,11 +74,14 @@ class UsuarioPanelService
             $this->actividad->registrar($admin, 'usuarios', 'contrasena', 'cambió la contraseña de '.ActividadService::cita($usuario->name), 'usuario', $usuario->id);
         }
 
+        // El correo de la cuenta no se copia al historial: solo que cambió
+        $cambios = ActividadService::cambios($foto, ['name' => $usuario->name, 'email' => $usuario->email, 'role' => $this->nombreRol($usuario->role)],
+            ['name' => 'Nombre', 'email' => 'Correo', 'role' => 'Rol'], ['email']);
         if ($antes !== $usuario->role) {
             $this->actividad->registrar($admin, 'usuarios', 'cambiar_rol',
-                'cambió el rol de '.ActividadService::cita($usuario->name).' a '.$this->nombreRol($usuario->role), 'usuario', $usuario->id);
+                'cambió el rol de '.ActividadService::cita($usuario->name).' a '.$this->nombreRol($usuario->role), 'usuario', $usuario->id, $cambios);
         } elseif ($usuario->wasChanged(['name', 'email'])) {
-            $this->actividad->registrar($admin, 'usuarios', 'editar', 'editó la cuenta de '.ActividadService::cita($usuario->name), 'usuario', $usuario->id);
+            $this->actividad->registrar($admin, 'usuarios', 'editar', 'editó la cuenta de '.ActividadService::cita($usuario->name), 'usuario', $usuario->id, $cambios);
         }
 
         return $usuario;

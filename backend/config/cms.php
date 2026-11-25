@@ -8,13 +8,13 @@
 
 return [
 
-    // Roles del panel. Quién aporta qué: el editor crea contenido, «contactos» solo atiende
-    // los formularios y el admin además aprueba, configura y gestiona usuarios.
-    'roles_panel'     => ['admin', 'editor', 'contactos'],
+    // Roles del panel. Quién aporta qué: el editor crea contenido y el admin además aprueba, configura
+    // y gestiona usuarios. Atención al cliente (formularios y correo de info@) ya no es de Gestión web:
+    // es un rol de la app DuaLab que trabaja en DuaLab Central («Primer contacto»), por la API firmada.
+    'roles_panel'     => ['admin', 'editor'],
     'roles_contenido' => ['admin', 'editor'],
-    'roles_contactos' => ['admin', 'editor', 'contactos'],
     'roles_admin'     => ['admin'],
-    'nombres_roles'   => ['admin' => 'Administración', 'editor' => 'Edición', 'contactos' => 'Atención de contactos'],
+    'nombres_roles'   => ['admin' => 'Administración', 'editor' => 'Edición'],
 
     // Buzón al que también llegan los formularios (Hostinger) y su webmail
     'buzon' => [
@@ -85,6 +85,26 @@ return [
         ],
     ],
 
+    // index.html compilado de la web (frontend/dist): el backend lo sirve con el texto de cada
+    // página ya escrito para Google y las IA (ver HtmlPublicoService). En producción, la ruta
+    // absoluta de public_html/home/index.html (WEB_INDEX_HTML en el .env del servidor).
+    'web_index' => env('WEB_INDEX_HTML') ?: base_path('../frontend/dist/index.html'),
+
+    // Rastreadores de IA que se pueden bloquear desde SEO → Buscadores de IA (robots.txt).
+    // Clave = User-agent exacto; bloquear uno no afecta a Google ni a Bing.
+    'bots_ia' => [
+        'GPTBot'           => 'OpenAI (entrena ChatGPT)',
+        'OAI-SearchBot'    => 'Búsqueda de ChatGPT',
+        'ChatGPT-User'     => 'ChatGPT al abrir un enlace',
+        'ClaudeBot'        => 'Anthropic (Claude)',
+        'Claude-SearchBot' => 'Búsqueda de Claude',
+        'PerplexityBot'    => 'Perplexity',
+        'Google-Extended'  => 'Gemini (no afecta a Google Search)',
+        'Applebot-Extended' => 'Apple Intelligence',
+        'meta-externalagent' => 'Meta AI',
+        'CCBot'            => 'Common Crawl (datos abiertos para entrenar IA)',
+    ],
+
     /*
     | Ajustes del sitio (tabla `ajustes`). Lista blanca: clave => [reglas, público, secreto].
     | - publico: lo devuelve /api/web/ajustes para la web pública.
@@ -100,6 +120,25 @@ return [
         'seo.indexar'             => ['reglas' => ['nullable', 'boolean'],          'publico' => true],
         // Verificación de Search Console: quien la pone puede reclamar la web en Google → solo admin.
         'seo.search_console'      => ['reglas' => ['nullable', 'string', 'max:100', 'regex:/^[A-Za-z0-9_\-]+$/'], 'publico' => true, 'solo_admin' => true],
+
+        // Datos de la organización (Yoast → «Representación en buscadores»): van en el JSON-LD
+        // de todas las páginas y en llms.txt. La descripción es seo.descripcion.
+        'seo.org_nombre'          => ['reglas' => ['nullable', 'string', 'max:120'], 'publico' => true],
+        'seo.org_logo'            => ['reglas' => ['nullable', 'string', 'max:255', 'url_medio'], 'publico' => true],
+        'seo.org_email'           => ['reglas' => ['nullable', 'email:rfc', 'max:120'], 'publico' => true],
+        'seo.org_telefono'        => ['reglas' => ['nullable', 'string', 'max:30', 'regex:/^[0-9+() .\-]{6,30}$/'], 'publico' => true],
+        'seo.org_direccion'       => ['reglas' => ['nullable', 'string', 'max:160'], 'publico' => true],
+        'seo.org_codigo_postal'   => ['reglas' => ['nullable', 'string', 'max:10', 'regex:/^[0-9A-Za-z \-]+$/'], 'publico' => true],
+        'seo.org_localidad'       => ['reglas' => ['nullable', 'string', 'max:80'], 'publico' => true],
+        'seo.org_provincia'       => ['reglas' => ['nullable', 'string', 'max:80'], 'publico' => true],
+        // Perfiles en redes (LinkedIn, Instagram…): sameAs del JSON-LD
+        'seo.org_redes'           => ['reglas' => ['nullable', 'array', 'max:8'], 'items' => ['url:https', 'max:255'], 'publico' => true],
+
+        // Buscadores de IA (GEO). Decidir qué IA pueden leer la web es del admin.
+        // ia_bloqueados: bots de config('cms.bots_ia') que no pueden leerla (robots.txt).
+        'seo.ia_bloqueados'       => ['reglas' => ['nullable', 'array'], 'items' => ['string', 'bot_ia'], 'publico' => false, 'solo_admin' => true],
+        // Presentación de DuaLab para las IA, al principio de /llms.txt
+        'seo.llms_resumen'        => ['reglas' => ['nullable', 'string', 'max:3000'], 'publico' => false],
 
         // Apariencia de la web (solo admin). Opciones cerradas: las mismas claves que
         // frontend/src/data/apariencia.js. Nada de CSS, HTML ni colores libres.
@@ -121,10 +160,12 @@ return [
         'analitica.gtm_id'        => ['reglas' => ['nullable', 'string', 'regex:/^GTM-[A-Z0-9]{4,12}$/'], 'publico' => true],
         'analitica.activa'        => ['reglas' => ['nullable', 'boolean'],          'publico' => true],
 
-        // Integraciones de formularios (Flamingo + CRM/mail marketing)
-        'integraciones.webhook_url'    => ['reglas' => ['nullable', 'url:https', 'max:500'], 'publico' => false],
-        'integraciones.webhook_activo' => ['reglas' => ['nullable', 'boolean'],           'publico' => false],
-        'integraciones.webhook_secreto' => ['reglas' => ['nullable', 'string', 'min:16', 'max:120'], 'publico' => false, 'secreto' => true],
+        // Integraciones de formularios. El aviso a la app DuaLab (captaciones en Central) no está aquí:
+        // es del servidor (config/services.php → app_dualab). crm_*: aviso opcional a un CRM externo
+        // (HubSpot, Pipedrive, Zapier, n8n…)
+        'integraciones.crm_url'        => ['reglas' => ['nullable', 'url:https', 'max:500'], 'publico' => false],
+        'integraciones.crm_activo'     => ['reglas' => ['nullable', 'boolean'],           'publico' => false],
+        'integraciones.crm_secreto'    => ['reglas' => ['nullable', 'string', 'min:16', 'max:120'], 'publico' => false, 'secreto' => true],
         'integraciones.brevo_api_key'  => ['reglas' => ['nullable', 'string', 'max:200'], 'publico' => false, 'secreto' => true],
         'integraciones.brevo_lista_id' => ['reglas' => ['nullable', 'integer', 'min:1'],  'publico' => false],
         'integraciones.mailchimp_api_key' => ['reglas' => ['nullable', 'string', 'max:200'], 'publico' => false, 'secreto' => true],

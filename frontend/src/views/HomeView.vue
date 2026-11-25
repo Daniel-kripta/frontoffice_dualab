@@ -106,7 +106,7 @@
         </button>
       </div>
       <div v-reveal="150">
-        <EcosystemDiagram />
+        <EcosystemDiagram :textos="ecosistemaAgentes" />
       </div>
     </div>
   </section>
@@ -135,13 +135,13 @@
         aria-controls="otros-servicios"
         @click="moreServicesOpen = !moreServicesOpen"
       >
-        Otros servicios
+        {{ p.t('otros_servicios.boton', 'Otros servicios') }}
         <svg class="w-4 h-4 transition-transform duration-300" :class="moreServicesOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
       </button>
     </div>
     <Transition name="expand">
       <div v-show="moreServicesOpen" id="otros-servicios" class="max-w-6xl mx-auto mt-8 bg-white rounded-2xl p-8 shadow-[0_2px_12px_rgba(23,40,62,0.05)]">
-        <p class="text-sm text-gray-500 text-center mb-8">Además de la plataforma, te acompañamos con servicios de consultoría y formación</p>
+        <p class="text-sm text-gray-500 text-center mb-8">{{ p.t('otros_servicios.descripcion', 'Además de la plataforma, te acompañamos con servicios de consultoría y formación') }}</p>
         <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
           <ServiceItem v-for="s in serviciosItems" :key="s.title"
                        :icon="s.icon" :title="s.title" :desc="s.desc"
@@ -174,7 +174,7 @@
           <EnlaceCms :to="retosEmpresa.to" class="btn-pill bg-empresas hover:bg-empresas/90">{{ retosEmpresa.texto }}</EnlaceCms>
           <!-- Formulario de alumnado bloqueado de momento (ver contactoConfig.js) -->
           <span class="btn-pill bg-alumnos/50 shadow-none cursor-not-allowed hover:translate-y-0" aria-disabled="true" title="Próximamente">
-            Encuentra tus prácticas
+            {{ p.t('retos.boton_alumnado', 'Encuentra tus prácticas') }}
             <span class="text-[10px] font-black bg-white/25 rounded-full px-2 py-0.5 normal-case tracking-normal">Próximamente</span>
           </span>
           <EnlaceCms :to="retosExplorar.to" class="btn-pill bg-administraciones hover:bg-administraciones/90">{{ retosExplorar.texto }}</EnlaceCms>
@@ -209,6 +209,7 @@
     <div class="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
       <div v-for="(a, i) in agentes" :id="a.id" :key="a.title" v-reveal="i * 100" class="scroll-mt-24">
         <AgentCard :title="a.title" :desc="a.desc" :image="a.image" :bullets="a.bullets" :color="a.color"
+                   :texto-boton="p.t('agentes.boton', 'Más información')"
                    @more="activeService = a.modal" />
       </div>
     </div>
@@ -230,17 +231,17 @@
           {{ p.t('plataforma.descripcion', 'Una plataforma intuitiva y completa para gestionar prácticas, tutores, documentación, comunicaciones y mucho más, con información siempre actualizada y accesible para todos los agentes.') }}
         </p>
         <ul class="space-y-2 mt-6">
-          <li v-for="p in plataformaFeatures" :key="p" class="flex items-center gap-2.5 font-medium text-azul-noche">
+          <li v-for="item in plataformaFeatures" :key="item" class="flex items-center gap-2.5 font-medium text-azul-noche">
             <span class="w-5 h-5 rounded-full bg-administraciones flex items-center justify-center shrink-0">
               <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1.5 5l2.5 2.5L8.5 2" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            {{ p }}
+            {{ item }}
           </li>
         </ul>
         <div class="flex flex-wrap gap-3 mt-8">
           <EnlaceCms :to="plataformaDemo.to" class="btn-pill bg-primary-600 hover:bg-primary-700 px-8">{{ plataformaDemo.texto }}</EnlaceCms>
           <!-- Enlace externo: la herramienta es otra SPA (mismo botón que en el navbar) -->
-          <a :href="`${toolUrl}/login`" class="btn-pill-outline">Usar DuaLab</a>
+          <a :href="`${toolUrl}/login`" class="btn-pill-outline">{{ p.t('plataforma.boton_herramienta', 'Usar DuaLab') }}</a>
         </div>
       </div>
     </div>
@@ -269,7 +270,7 @@
         class="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-[#1F2937] border-2 border-gray-200 rounded-full font-black text-sm uppercase tracking-widest hover:border-primary-600 hover:text-primary-600 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
         @click="openGallery()"
       >
-        Ver más
+        {{ p.t('galeria.boton_ver_mas', 'Ver más') }}
       </button>
     </div>
   </section>
@@ -277,13 +278,13 @@
   <GalleryModal :open="galleryOpen" :images="allGalleryImages" :start-index="galleryStart" @close="galleryOpen = false" />
 
   <!-- CÓMO FUNCIONA: modal que abren "Cómo funciona" (hero) y "Descubre en qué consiste" -->
-  <ComoFuncionaModal :open="comoFuncionaOpen" @close="comoFuncionaOpen = false" @demo="onComoFuncionaDemo" />
+  <ComoFuncionaModal :open="comoFuncionaOpen" :textos="comoFunciona" @close="comoFuncionaOpen = false" @demo="onComoFuncionaDemo" />
 
   <!-- FAMILIAS PROFESIONALES (solo el rótulo y "Profesionales" en tono Alumnado) -->
   <section class="bg-white py-20 px-6">
     <div v-reveal class="max-w-4xl mx-auto text-center mb-8">
       <p class="section-eyebrow !text-alumnos">{{ p.t('familias.antetitulo', 'Formación') }}</p>
-      <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche">Familias <span class="text-alumnos">Profesionales</span></h2>
+      <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche">{{ p.t('familias.titulo', 'Familias') }} <span class="text-alumnos">{{ p.t('familias.destacado', 'Profesionales') }}</span></h2>
       <p class="text-gray-500 mt-2 font-medium">{{ p.t('familias.subtitulo', 'Retos organizados en áreas clave del mercado laboral') }}</p>
     </div>
     <div v-reveal="100" class="text-center">
@@ -484,7 +485,7 @@ const alumnosFeatures = [
 // Funcionalidades clave: cada tarjeta abre el mismo ServiceModal que "Otros
 // servicios", con contenido tomado de los servicios relacionados.
 const DEMO = { label: 'Solicitar demo', tipo: '' }
-const funcionalidades = [
+const funcionalidadesOriginales = [
   {
     title: 'Gestión de prácticas', icon: CalendarDaysIcon, iconClass: 'text-centros',
     desc: 'Publicación de ofertas, asignación y seguimiento en un único entorno.',
@@ -580,7 +581,7 @@ const funcionalidades = [
   },
 ]
 
-const plataformaFeatures = [
+const plataformaFeaturesOriginales = [
   'Seguimiento en tiempo real',
   'Gestión documental',
   'Tutorías y evaluaciones',
@@ -591,7 +592,7 @@ const plataformaFeatures = [
 // "Una solución para cada agente": la tarjeta muestra lo esencial y "Más
 // información" abre el modal con el contenido de las antiguas secciones
 // Para Empresas / Centros / Alumnos (mismo ServiceModal que los servicios).
-const agentes = [
+const agentesOriginales = [
   {
     title: 'Centros Educativos', color: 'centros', image: centroEducativo,
     desc: 'Mejora la empleabilidad de tus estudiantes.',
@@ -650,7 +651,7 @@ const agentes = [
   },
 ]
 
-const serviciosItems = [
+const serviciosOriginales = [
   {
     title: 'Consultoría y asesoría',
     icon: PresentationChartBarIcon,
@@ -773,6 +774,54 @@ const serviciosItems = [
     ],
   },
 ]
+
+// ── Textos de las tarjetas editables desde el panel (config/cms_paginas.php → inicio) ──
+// Iconos, colores, imágenes y modales se quedan en los arrays de arriba; aquí solo se
+// sustituyen los textos que se ven en la página (campos item_N_* de cada sección).
+
+// Funcionalidades clave: el título del modal es el mismo que el de la tarjeta
+const funcionalidades = computed(() => funcionalidadesOriginales.map((f, i) => {
+  const title = p.t(`funcionalidades.item_${i + 1}_titulo`, f.title)
+  return { ...f, title, desc: p.t(`funcionalidades.item_${i + 1}_texto`, f.desc), modal: { ...f.modal, title } }
+}))
+
+// Otros servicios: el modal (activeService = s) muestra el mismo título
+const serviciosItems = computed(() => serviciosOriginales.map((s, i) => ({
+  ...s,
+  title: p.t(`otros_servicios.item_${i + 1}_titulo`, s.title),
+  desc: p.t(`otros_servicios.item_${i + 1}_texto`, s.desc),
+})))
+
+// Una solución para cada agente: título, frase y los cuatro puntos de cada tarjeta
+const agentes = computed(() => agentesOriginales.map((a, i) => ({
+  ...a,
+  title: p.t(`agentes.item_${i + 1}_titulo`, a.title),
+  desc: p.t(`agentes.item_${i + 1}_texto`, a.desc),
+  bullets: a.bullets.map((b, j) => p.t(`agentes.item_${i + 1}_punto_${j + 1}`, b)),
+})))
+
+const plataformaFeatures = computed(() => plataformaFeaturesOriginales.map((f, i) => p.t(`plataforma.item_${i + 1}_texto`, f)))
+
+// Diagrama del ecosistema (EcosystemDiagram): nombre y frase de cada agente, en su orden
+const ecosistemaAgentes = computed(() => [
+  { titulo: p.t('ecosistema.item_1_titulo', 'Centros Educativos'), texto: p.t('ecosistema.item_1_texto', 'Gestionan, coordinan y potencian la FP Dual') },
+  { titulo: p.t('ecosistema.item_2_titulo', 'Empresas'), texto: p.t('ecosistema.item_2_texto', 'Apoyan el talento y colaboran en proyectos reales') },
+  { titulo: p.t('ecosistema.item_3_titulo', 'Alumnado'), texto: p.t('ecosistema.item_3_texto', 'Desarrolla su talento en entornos profesionales') },
+  { titulo: p.t('ecosistema.item_4_titulo', 'Administraciones'), texto: p.t('ecosistema.item_4_texto', 'Impulsan y hacen crecer la Formación Dual') },
+])
+
+// Modal «¿Cómo funciona DuaLab?» (ComoFuncionaModal)
+const comoFunciona = computed(() => ({
+  antetitulo: p.t('como_funciona.antetitulo', 'Flujo de trabajo'),
+  titulo: p.t('como_funciona.titulo', '¿Cómo funciona DuaLab?'),
+  descripcion: p.t('como_funciona.descripcion', 'Tres pasos para transformar necesidades reales en aprendizaje práctico'),
+  pasos: [
+    { titulo: p.t('como_funciona.item_1_titulo', 'La Empresa propone'), texto: p.t('como_funciona.item_1_texto', 'Identifican una fricción o cuello de botella real en su día a día.') },
+    { titulo: p.t('como_funciona.item_2_titulo', 'La IA lo transforma'), texto: p.t('como_funciona.item_2_texto', 'DuaLab genera un reto académico alineado al currículo oficial.') },
+    { titulo: p.t('como_funciona.item_3_titulo', 'El Alumnado resuelve'), texto: p.t('como_funciona.item_3_texto', 'Ganan experiencia práctica mientras aportan valor real a la empresa.') },
+  ],
+  boton: p.t('como_funciona.boton', 'Solicitar demo'),
+}))
 
 </script>
 

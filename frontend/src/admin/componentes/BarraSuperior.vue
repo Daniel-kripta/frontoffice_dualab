@@ -8,7 +8,7 @@
     </button>
 
     <RouterLink :to="{ name: 'panel-escritorio' }" class="flex min-w-0 items-center gap-2.5">
-      <img :src="logo" alt="" class="h-9 w-auto shrink-0" />
+      <img :src="logo" alt="" class="h-9 w-9 shrink-0 rounded-[22%] ring-1 ring-white/25" />
       <span class="min-w-0">
         <span class="block truncate font-heading text-sm font-bold leading-tight sm:text-base">DuaLab</span>
         <span class="block truncate text-xs font-semibold text-white/60">Gestión de la web</span>
@@ -44,7 +44,8 @@ import { NOMBRES_ROLES } from '../roles'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Bars3Icon, XMarkIcon, ArrowTopRightOnSquareIcon, ArrowRightOnRectangleIcon } from '@heroicons/vue/24/outline'
-import logo from '@/assets/logo_colores.png'
+// Icono de Gestión web, igual que su favicon (iconos-herramientas.mjs --barra en microretos)
+import logo from '@/assets/gestion-web-barra.png'
 import { usePanelSesion } from '@/stores/panelSesion'
 
 defineProps({ menuAbierto: { type: Boolean, default: false } })

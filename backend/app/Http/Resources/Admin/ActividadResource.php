@@ -18,6 +18,7 @@ class ActividadResource extends JsonResource
             'accion'      => $this->accion,
             'descripcion' => $this->descripcion,
             'objeto'      => $this->objeto_tipo ? ['tipo' => $this->objeto_tipo, 'ref' => $this->objeto_ref] : null,
+            'detalle'     => $this->detalle ?? [], // qué cambió: [{ campo, antes, despues }]
             'fecha'       => $this->created_at,
         ];
     }

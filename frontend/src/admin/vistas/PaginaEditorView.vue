@@ -4,6 +4,7 @@
     <a v-if="enlace" :href="enlace" target="_blank" rel="noopener" class="gw-accion-secundaria">
       <ArrowTopRightOnSquareIcon class="h-4 w-4" aria-hidden="true" /> Ver en la web
     </a>
+    <ComoNosVen v-if="enlace" :ruta="enlace" :idioma="idioma" />
     <button type="button" class="gw-accion-principal" :disabled="guardando || !hayCambios" @click="guardar">
       {{ guardando ? 'Guardando…' : 'Guardar cambios' }}
     </button>
@@ -113,6 +114,7 @@ import { useRoute } from 'vue-router'
 import { ArrowTopRightOnSquareIcon, ChevronDownIcon } from '@heroicons/vue/24/outline'
 import CabeceraPanel from '../componentes/CabeceraPanel.vue'
 import CampoContenido from '../componentes/CampoContenido.vue'
+import ComoNosVen from '../componentes/ComoNosVen.vue'
 import CajaSeo from '../componentes/CajaSeo.vue'
 import HistorialActividad from '../componentes/HistorialActividad.vue'
 import { paginasService } from '@/services/admin/paginasService'

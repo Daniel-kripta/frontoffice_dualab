@@ -53,7 +53,7 @@ class FormularioController extends Controller
     {
         $this->bandeja->marcarLeido($contacto);
 
-        return new FormularioResource($contacto);
+        return new FormularioResource($contacto->load('respuestas.usuario'));
     }
 
     public function update(UpdateFormularioRequest $request, Contacto $contacto): FormularioResource

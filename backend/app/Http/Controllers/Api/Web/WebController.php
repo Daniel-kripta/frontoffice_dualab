@@ -11,6 +11,7 @@ use App\Models\Entrada;
 use App\Models\Idioma;
 use App\Models\Pagina;
 use App\Services\PaginaService;
+use App\Services\VisibilidadService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -25,11 +26,15 @@ class WebController extends Controller
     /** Ajustes públicos (SEO global, analítica) e idiomas activos. */
     public function configuracion(): JsonResponse
     {
+        // Solo arrays en caché: la caché no deserializa objetos (cache.serializable_classes = false)
+        // y una Collection volvería como __PHP_Incomplete_Class
         $datos = Cache::remember('web.configuracion', now()->addHour(), fn () => [
-            'idiomas'      => Idioma::activos()->get(['codigo', 'nombre', 'por_defecto']),
+            'idiomas'      => Idioma::activos()->get(['codigo', 'nombre', 'por_defecto'])->toArray(),
             'ajustes'      => collect(config('cms.ajustes'))
                 ->filter(fn ($def) => $def['publico'])
-                ->map(fn ($def, $clave) => Ajuste::leer($clave)),
+                ->map(fn ($def, $clave) => Ajuste::leer($clave))
+                ->all(),
+            'organizacion' => app(VisibilidadService::class)->organizacion(),
         ]);
 
         return response()->json($datos);

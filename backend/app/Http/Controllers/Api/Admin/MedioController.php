@@ -70,8 +70,11 @@ class MedioController extends Controller
 
     public function update(UpdateMedioRequest $request, Medio $medio): MedioResource
     {
+        $campos = ['titulo' => 'Título', 'alt' => 'Texto alternativo'];
+        $antes  = $medio->only(array_keys($campos));
         $medio->update($request->validated());
-        $this->actividad->registrar($request->user(), 'medios', 'editar', 'editó los datos de '.ActividadService::cita($medio->titulo), 'medio', $medio->id);
+        $this->actividad->registrar($request->user(), 'medios', 'editar', 'editó los datos de '.ActividadService::cita($medio->titulo), 'medio', $medio->id,
+            ActividadService::cambios($antes, $medio->only(array_keys($campos)), $campos));
 
         return new MedioResource($medio);
     }

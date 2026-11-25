@@ -12,7 +12,7 @@
 
   <template v-else>
     <!-- Cifras -->
-    <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
       <RouterLink v-for="c in cifras" :key="c.titulo" :to="c.to" class="gw-tarjeta block p-4 transition hover:border-administraciones-dark/30 hover:shadow-md sm:p-5">
         <component :is="c.icono" class="h-6 w-6" :class="c.color" aria-hidden="true" />
         <p class="mt-3 font-heading text-2xl font-bold text-azul-noche sm:text-3xl">
@@ -25,26 +25,14 @@
     </div>
 
     <div class="mt-6 grid gap-6 lg:grid-cols-2">
-      <!-- Últimos formularios -->
-      <section class="gw-tarjeta p-5">
-        <div class="mb-3 flex items-center justify-between gap-2">
-          <h2 class="font-heading text-base font-bold text-azul-noche">Últimos formularios</h2>
-          <RouterLink :to="{ name: 'panel-formularios' }" class="gw-enlace text-sm">Ver todos</RouterLink>
-        </div>
-        <ul v-if="cargando" class="space-y-3"><li v-for="n in 4" :key="n" class="h-10 animate-pulse rounded-xl bg-gray-100" /></ul>
-        <p v-else-if="!datos.formularios.ultimos.length" class="py-6 text-center text-sm text-texto-secundario">Todavía no ha llegado ningún formulario.</p>
-        <ul v-else class="divide-y divide-gray-100">
-          <li v-for="f in datos.formularios.ultimos" :key="f.id">
-            <RouterLink :to="{ name: 'panel-formularios', query: { ver: f.id } }" class="flex items-center gap-3 py-2.5 hover:bg-gray-50 -mx-2 px-2 rounded-xl">
-              <span class="h-2 w-2 shrink-0 rounded-full" :class="f.estado === 'nuevo' ? 'bg-alumnos' : 'bg-transparent'" />
-              <span class="min-w-0 flex-1">
-                <span class="block truncate text-sm text-azul-noche" :class="f.estado === 'nuevo' ? 'font-bold' : 'font-medium'">{{ f.nombre }} {{ f.apellidos }}</span>
-                <span class="block truncate text-xs text-texto-secundario">{{ f.formulario_nombre }}<template v-if="f.accion_nombre"> · {{ f.accion_nombre }}</template></span>
-              </span>
-              <span class="shrink-0 text-xs text-texto-secundario">{{ haceCuanto(f.created_at) }}</span>
-            </RouterLink>
-          </li>
-        </ul>
+      <!-- Formularios y correo: se atienden en DuaLab Central -->
+      <section class="gw-tarjeta flex flex-col justify-center p-5">
+        <h2 class="font-heading text-base font-bold text-azul-noche">Formularios y correo</h2>
+        <p class="mt-1 text-sm text-texto-secundario">Los formularios de la web y el correo de info@ se atienden en DuaLab Central, en «Primer contacto».</p>
+        <a :href="URL_PRIMER_CONTACTO" target="_blank" rel="noopener" class="gw-accion-secundaria mt-4 inline-flex w-fit">
+          Abrir DuaLab Central <ArrowTopRightOnSquareIcon class="h-4 w-4" aria-hidden="true" />
+          <span class="sr-only">(se abre en otra pestaña)</span>
+        </a>
       </section>
 
       <!-- Entradas recientes -->
@@ -106,10 +94,11 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import {
-  PlusIcon, InboxIcon, NewspaperIcon, DocumentDuplicateIcon, PhotoIcon, CheckCircleIcon,
+  PlusIcon, ArrowTopRightOnSquareIcon, NewspaperIcon, DocumentDuplicateIcon, PhotoIcon, CheckCircleIcon,
   PencilSquareIcon, ArrowUpTrayIcon, MagnifyingGlassCircleIcon, HomeModernIcon,
 } from '@heroicons/vue/24/outline'
 import CabeceraPanel from '../componentes/CabeceraPanel.vue'
+import { URL_PRIMER_CONTACTO } from '../central'
 import { escritorioService } from '@/services/admin/escritorioService'
 import { mensajeError } from '@/services/admin/panelApi'
 import { usePanelSesion } from '@/stores/panelSesion'
@@ -118,7 +107,7 @@ import { haceCuanto, tamano, ESTADOS_ENTRADA } from '../utilidades'
 const sesion = usePanelSesion()
 const nombre = computed(() => sesion.usuario?.name?.split(' ')[0] ?? '')
 
-const vacio = { formularios: { nuevos: 0, semana: 0, ultimos: [] }, entradas: { publicadas: 0, borradores: 0, pendientes: 0, ultimas: [] }, paginas: { total: 0, editadas: 0 }, medios: { total: 0, tamano: 0 }, idiomas: {}, configuracion: {} }
+const vacio = { entradas: { publicadas: 0, borradores: 0, pendientes: 0, ultimas: [] }, paginas: { total: 0, editadas: 0 }, medios: { total: 0, tamano: 0 }, idiomas: {}, configuracion: {} }
 const datos = ref(vacio)
 const cargando = ref(true)
 const error = ref('')
@@ -137,7 +126,6 @@ async function cargar() {
 onMounted(cargar)
 
 const cifras = computed(() => [
-  { titulo: 'Formularios nuevos', valor: datos.value.formularios.nuevos, detalle: `${datos.value.formularios.semana} en los últimos 7 días`, icono: InboxIcon, color: 'text-alumnos', to: { name: 'panel-formularios', query: { estado: 'nuevo' } } },
   {
     titulo: 'Entradas publicadas', valor: datos.value.entradas.publicadas, icono: NewspaperIcon, color: 'text-centros',
     detalle: datos.value.entradas.pendientes ? `${datos.value.entradas.pendientes} pendientes de aprobar` : `${datos.value.entradas.borradores} en borrador`,

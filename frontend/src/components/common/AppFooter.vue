@@ -63,7 +63,11 @@
         <ul class="flex flex-wrap justify-center items-center gap-x-3 gap-y-1">
           <li v-for="(l, i) in legal" :key="l" class="flex items-center gap-3">
             <span>{{ l }}</span>
-            <span v-if="i < legal.length - 1" class="text-primary-300" aria-hidden="true">|</span>
+            <span v-if="i < legal.length - 1 || hayAnalitica" class="text-primary-300" aria-hidden="true">|</span>
+          </li>
+          <!-- Solo si hay analítica activa: permite cambiar o retirar el consentimiento -->
+          <li v-if="hayAnalitica">
+            <button type="button" class="py-1 hover:text-primary-900 underline-offset-2 hover:underline" @click="reabrir">Configurar cookies</button>
           </li>
         </ul>
       </div>
@@ -76,9 +80,11 @@ import { PhoneIcon, EnvelopeIcon, MapPinIcon } from '@heroicons/vue/24/outline'
 import LogoLegend from '@/components/common/LogoLegend.vue'
 import logoOriginal from '@/assets/logo_colores.png'
 import { useConfiguracionWeb } from '@/composables/useConfiguracionWeb'
+import { useConsentimientoCookies } from '@/composables/useConsentimientoCookies'
 
 // Logo: el de Apariencia en el panel o el original
 const { apariencia } = useConfiguracionWeb()
+const { hayAnalitica, reabrir } = useConsentimientoCookies()
 
 const year = new Date().getFullYear()
 

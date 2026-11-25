@@ -6,7 +6,7 @@
        Móvil/tablet: solo la versión del agente activo (sin huecos). -->
   <div class="flex flex-col h-full">
     <p class="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.25em] text-primary-600 mb-4">
-      Contacto <span class="w-10 h-px bg-primary-300" aria-hidden="true" />
+      {{ antetitulo }} <span class="w-10 h-px bg-primary-300" aria-hidden="true" />
     </p>
 
     <div class="pila">
@@ -53,10 +53,12 @@
 </template>
 
 <script setup>
-// agentes: { clave: config } de los agentes elegibles; activo: clave del agente elegido
+// agentes: { clave: config } de los agentes elegibles; activo: clave del agente elegido;
+// antetitulo: etiqueta superior (la vista la pasa editable desde el panel)
 const props = defineProps({
   agentes: { type: Object, required: true },
   activo: { type: String, required: true },
+  antetitulo: { type: String, default: 'Contacto' },
 })
 
 // Versión inactiva: en escritorio ocupa sitio sin verse; en móvil/tablet no existe

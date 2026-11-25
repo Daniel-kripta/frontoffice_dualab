@@ -9,6 +9,8 @@
     <AppFooter />
     <AvisoCookies />
   </div>
+  <!-- Fuera del v-if: también en el panel de gestión web -->
+  <AvisoNuevaVersion :en-panel="enPanel" />
 </template>
 
 <script setup>
@@ -17,6 +19,7 @@ import { useRoute } from 'vue-router'
 import AppNavbar from '@/components/common/AppNavbar.vue'
 import AppFooter from '@/components/common/AppFooter.vue'
 import AvisoCookies from '@/components/common/AvisoCookies.vue'
+import AvisoNuevaVersion from '@/components/common/AvisoNuevaVersion.vue'
 import { useConfiguracionWeb } from '@/composables/useConfiguracionWeb'
 import { aplicarApariencia, enVistaPrevia, quitarApariencia } from '@/composables/useApariencia'
 

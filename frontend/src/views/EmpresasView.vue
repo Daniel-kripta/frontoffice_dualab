@@ -68,7 +68,7 @@
   <!-- VENTAJAS -->
   <section class="bg-white py-14 px-6">
     <div v-reveal class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-0 lg:divide-x lg:divide-gray-100">
-      <div v-for="v in ventajas" :key="v.title" class="flex sm:flex-col gap-4 sm:gap-3 lg:px-5 lg:first:pl-0 lg:last:pr-0">
+      <div v-for="v in ventajasTextos" :key="v.title" class="flex sm:flex-col gap-4 sm:gap-3 lg:px-5 lg:first:pl-0 lg:last:pr-0">
         <span class="w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0" :class="v.bg">
           <component :is="v.icon" class="w-6 h-6" />
         </span>
@@ -89,19 +89,19 @@
       </div>
 
       <div v-reveal="150">
-        <p class="section-eyebrow">Plataforma DuaLab</p>
+        <p class="section-eyebrow">{{ p.t('plataforma.antetitulo', 'Plataforma DuaLab') }}</p>
         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">
-          Todo lo que necesitas para colaborar con la <span class="text-primary-500">Formación Dual</span>
+          {{ p.t('plataforma.titulo', 'Todo lo que necesitas para colaborar con la') }} <span class="text-primary-500">{{ p.t('plataforma.destacado', 'Formación Dual') }}</span>
         </h2>
         <p class="text-gray-500 leading-relaxed mt-5">
-          Un espacio para conectar con centros, coordinar a tu equipo y acompañar al alumnado.
+          {{ p.t('plataforma.descripcion', 'Un espacio para conectar con centros, coordinar a tu equipo y acompañar al alumnado.') }}
         </p>
         <ul class="mt-6 bg-white rounded-2xl divide-y divide-gray-100 shadow-[0_2px_12px_rgba(23,40,62,0.05)]">
-          <li v-for="p in plataforma" :key="p.label" class="flex items-center gap-4 px-4 py-3">
-            <span class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" :class="p.soft">
-              <component :is="p.icon" class="w-5 h-5" />
+          <li v-for="item in plataformaTextos" :key="item.label" class="flex items-center gap-4 px-4 py-3">
+            <span class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" :class="item.soft">
+              <component :is="item.icon" class="w-5 h-5" />
             </span>
-            <span class="flex-1 min-w-0 font-medium text-sm text-azul-noche">{{ p.label }}</span>
+            <span class="flex-1 min-w-0 font-medium text-sm text-azul-noche">{{ item.label }}</span>
             <CheckIcon class="w-4 h-4 text-empresas shrink-0" aria-hidden="true" />
           </li>
         </ul>
@@ -113,16 +113,16 @@
   <section class="bg-white py-20 px-6">
     <div class="max-w-6xl mx-auto">
       <div v-reveal class="mb-10">
-        <p class="section-eyebrow">Cómo funciona</p>
+        <p class="section-eyebrow">{{ p.t('pasos.antetitulo', 'Cómo funciona') }}</p>
         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">
-          Empieza con <span class="text-primary-500">DuaLab</span> en 4 pasos
+          {{ p.t('pasos.titulo', 'Empieza con') }} <span class="text-primary-500">{{ p.t('pasos.destacado', 'DuaLab') }}</span> {{ p.t('pasos.titulo_final', 'en 4 pasos') }}
         </h2>
       </div>
       <ol v-reveal="100" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <li v-for="(p, i) in pasos" :key="p.title"
+        <li v-for="(paso, i) in pasosTextos" :key="paso.title"
             class="bg-superficie rounded-2xl p-5">
           <div class="flex items-center gap-3">
-            <span class="w-11 h-11 rounded-full flex items-center justify-center text-white font-heading font-black text-lg shadow-md shrink-0" :class="p.bg">
+            <span class="w-11 h-11 rounded-full flex items-center justify-center text-white font-heading font-black text-lg shadow-md shrink-0" :class="paso.bg">
               {{ i + 1 }}
             </span>
             <!-- Conector hacia el siguiente paso (solo en fila completa) -->
@@ -131,8 +131,8 @@
               <ArrowRightIcon class="w-4 h-4 text-primary-400 -ml-1" />
             </span>
           </div>
-          <h3 class="font-heading font-bold text-azul-noche mt-4">{{ p.title }}</h3>
-          <p class="text-sm text-gray-500 leading-snug mt-1">{{ p.desc }}</p>
+          <h3 class="font-heading font-bold text-azul-noche mt-4">{{ paso.title }}</h3>
+          <p class="text-sm text-gray-500 leading-snug mt-1">{{ paso.desc }}</p>
         </li>
       </ol>
     </div>
@@ -142,16 +142,16 @@
   <section class="bg-superficie py-20 px-6">
     <div class="max-w-6xl mx-auto">
       <div v-reveal class="mb-10">
-        <p class="section-eyebrow">Formas de colaborar</p>
+        <p class="section-eyebrow">{{ p.t('colaboraciones.antetitulo', 'Formas de colaborar') }}</p>
         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">
-          Una colaboración adaptada a <span class="text-primary-500">tu empresa</span>
+          {{ p.t('colaboraciones.titulo', 'Una colaboración adaptada a') }} <span class="text-primary-500">{{ p.t('colaboraciones.destacado', 'tu empresa') }}</span>
         </h2>
         <p class="text-gray-500 leading-relaxed mt-3">
-          Diferentes formas de participar, con un objetivo común: conectar formación y realidad profesional.
+          {{ p.t('colaboraciones.descripcion', 'Diferentes formas de participar, con un objetivo común: conectar formación y realidad profesional.') }}
         </p>
       </div>
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <article v-for="(c, i) in colaboraciones" :key="c.title" v-reveal="i * 100"
+        <article v-for="(c, i) in colaboracionesTextos" :key="c.title" v-reveal="i * 100"
                  class="sm:last:col-span-2 lg:last:col-span-1 bg-white rounded-2xl overflow-hidden flex flex-col shadow-[0_2px_12px_rgba(23,40,62,0.05)]">
           <img :src="c.image" :alt="c.alt" class="w-full h-48 object-cover" loading="lazy" />
           <div class="p-5 flex gap-4 flex-1">
@@ -161,11 +161,11 @@
             <div class="min-w-0 flex flex-col">
               <h3 class="font-heading font-bold text-azul-noche">{{ c.title }}</h3>
               <p class="text-sm text-gray-500 leading-snug mt-1 flex-1">{{ c.desc }}</p>
-              <RouterLink :to="contactoEmpresa"
+              <EnlaceCms :to="enlaceTarjetas.to"
                           class="inline-flex items-center gap-1.5 self-start mt-2 py-2.5 text-sm font-bold text-primary-600 hover:text-primary-700 group">
-                Descubrir más
+                {{ enlaceTarjetas.texto }}
                 <ArrowRightIcon class="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </RouterLink>
+              </EnlaceCms>
             </div>
           </div>
         </article>
@@ -178,9 +178,11 @@
     <div class="max-w-6xl mx-auto grid lg:grid-cols-[5fr_7fr] rounded-[2rem] overflow-hidden">
       <div v-reveal class="relative bg-azul-noche text-white p-8 pb-24 sm:p-10 sm:pb-24 lg:pb-10 flex flex-col justify-center gap-5 overflow-hidden">
         <h2 class="relative z-10 text-3xl md:text-4xl font-extrabold tracking-tight leading-tight">
-          Tu experiencia <span class="text-primary-400">también forma</span>
+          {{ p.t('experiencia.titulo', 'Tu experiencia') }} <span class="text-primary-400">{{ p.t('experiencia.destacado', 'también forma') }}</span>
         </h2>
-        <p class="relative z-10 text-white/85 leading-relaxed">
+        <p v-if="p.tiene('experiencia.descripcion')" class="relative z-10 text-white/85 leading-relaxed">{{ p.t('experiencia.descripcion') }}</p>
+        <!-- Sin editar en el panel: el original con sus resaltados -->
+        <p v-else class="relative z-10 text-white/85 leading-relaxed">
           La colaboración entre <strong class="text-[#8fc46a] font-semibold">empresas</strong> y centros ayuda a
           <strong class="text-primary-300 font-semibold">preparar</strong> profesionales que conocen los retos del mundo
           <strong class="text-[#ffb066] font-semibold">laboral</strong>.
@@ -190,21 +192,21 @@
       </div>
 
       <div v-reveal="150" class="bg-superficie p-8 sm:p-10">
-        <p class="section-eyebrow">Para tu empresa y tu entorno</p>
+        <p class="section-eyebrow">{{ p.t('valor.antetitulo', 'Para tu empresa y tu entorno') }}</p>
         <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-azul-noche leading-tight">
-          Valor para tu empresa y para <span class="text-primary-500">tu entorno</span>
+          {{ p.t('valor.titulo', 'Valor para tu empresa y para') }} <span class="text-primary-500">{{ p.t('valor.destacado', 'tu entorno') }}</span>
         </h2>
         <div class="grid sm:grid-cols-3 gap-4 mt-6">
-          <div v-for="v in valores" :key="v.title" class="bg-white rounded-2xl p-4">
+          <div v-for="v in valoresTextos" :key="v.title" class="bg-white rounded-2xl p-4">
             <component :is="v.icon" class="w-8 h-8" :class="v.text" />
             <p class="font-heading font-bold text-azul-noche mt-3">{{ v.title }}</p>
             <p class="text-sm text-gray-500 leading-snug mt-1">{{ v.desc }}</p>
           </div>
         </div>
-        <RouterLink :to="contactoEmpresa" class="btn-pill-outline mt-8">
-          Quiero colaborar
+        <EnlaceCms :to="valorBoton.to" class="btn-pill-outline mt-8">
+          {{ valorBoton.texto }}
           <ArrowRightIcon class="w-4 h-4" />
-        </RouterLink>
+        </EnlaceCms>
       </div>
     </div>
   </section>
@@ -213,19 +215,19 @@
   <section class="bg-white pb-20 px-6">
     <div class="max-w-6xl mx-auto grid lg:grid-cols-[5fr_7fr] gap-10 items-start">
       <div v-reveal>
-        <p class="section-eyebrow">Preguntas frecuentes</p>
-        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">Resolvemos tus dudas</h2>
+        <p class="section-eyebrow">{{ p.t('preguntas.antetitulo', 'Preguntas frecuentes') }}</p>
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-azul-noche leading-tight">{{ p.t('preguntas.titulo', 'Resolvemos tus dudas') }}</h2>
         <p class="text-gray-500 leading-relaxed mt-4 max-w-md">
-          Conoce cómo puede participar tu empresa en el ecosistema DuaLab.
+          {{ p.t('preguntas.descripcion', 'Conoce cómo puede participar tu empresa en el ecosistema DuaLab.') }}
         </p>
-        <RouterLink :to="contactoEmpresa" class="btn-pill-outline mt-8">
-          Hacer otra pregunta
+        <EnlaceCms :to="preguntasBoton.to" class="btn-pill-outline mt-8">
+          {{ preguntasBoton.texto }}
           <ArrowRightIcon class="w-4 h-4" />
-        </RouterLink>
+        </EnlaceCms>
       </div>
 
       <div v-reveal="150" class="space-y-3">
-        <div v-for="(f, i) in faqs" :key="f.q" class="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_12px_rgba(23,40,62,0.05)]">
+        <div v-for="(f, i) in faqsTextos" :key="f.q" class="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_12px_rgba(23,40,62,0.05)]">
           <button type="button"
                   class="w-full flex items-center gap-4 text-left px-5 py-4 font-medium text-sm text-azul-noche focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 rounded-2xl"
                   :aria-expanded="faqAbierta === i" :aria-controls="`faq-${i}`"
@@ -295,10 +297,14 @@ const router = useRouter()
 // Todas las acciones de la página llevan al formulario con "Empresa" marcado
 const contactoEmpresa = { name: 'contacto', query: { tipo: 'empresa' } }
 
-// Textos de la cabecera editables desde el panel de gestión web (config/cms_paginas.php → empresas)
+// Textos editables desde el panel de gestión web (config/cms_paginas.php → empresas)
 const p = usePagina('empresas', { titulo: 'Empresas' })
 const heroB1 = computed(() => p.boton('hero.boton_principal', { texto: 'Registrar mi empresa', to: contactoEmpresa }))
 const heroB2 = computed(() => p.boton('hero.boton_secundario', { texto: 'Solicitar demo', to: contactoEmpresa }))
+
+const enlaceTarjetas = computed(() => p.boton('colaboraciones.enlace_tarjetas', { texto: 'Descubrir más', to: contactoEmpresa }))
+const valorBoton     = computed(() => p.boton('valor.boton', { texto: 'Quiero colaborar', to: contactoEmpresa }))
+const preguntasBoton = computed(() => p.boton('preguntas.boton', { texto: 'Hacer otra pregunta', to: contactoEmpresa }))
 
 const faqAbierta = ref(null)
 
@@ -364,6 +370,37 @@ const faqs = [
   { q: '¿Cómo se coordina el seguimiento con el centro?',
     a: 'El seguimiento se hace desde la plataforma, en un espacio compartido con el equipo docente: comunicación con tutores, documentación y evolución del alumnado en un mismo lugar.' },
 ]
+
+// Las listas con los textos del panel: iconos, colores e imágenes siguen en los
+// arrays de arriba; solo se sustituyen los textos (item_N_titulo / item_N_texto).
+const ventajasTextos = computed(() => ventajas.map((v, i) => ({
+  ...v,
+  title: p.t(`ventajas.item_${i + 1}_titulo`, v.title),
+  desc: p.t(`ventajas.item_${i + 1}_texto`, v.desc),
+})))
+const plataformaTextos = computed(() => plataforma.map((item, i) => ({
+  ...item,
+  label: p.t(`plataforma.item_${i + 1}_titulo`, item.label),
+})))
+const pasosTextos = computed(() => pasos.map((paso, i) => ({
+  ...paso,
+  title: p.t(`pasos.item_${i + 1}_titulo`, paso.title),
+  desc: p.t(`pasos.item_${i + 1}_texto`, paso.desc),
+})))
+const colaboracionesTextos = computed(() => colaboraciones.map((c, i) => ({
+  ...c,
+  title: p.t(`colaboraciones.item_${i + 1}_titulo`, c.title),
+  desc: p.t(`colaboraciones.item_${i + 1}_texto`, c.desc),
+})))
+const valoresTextos = computed(() => valores.map((v, i) => ({
+  ...v,
+  title: p.t(`valor.item_${i + 1}_titulo`, v.title),
+  desc: p.t(`valor.item_${i + 1}_texto`, v.desc),
+})))
+const faqsTextos = computed(() => faqs.map((f, i) => ({
+  q: p.t(`preguntas.item_${i + 1}_titulo`, f.q),
+  a: p.t(`preguntas.item_${i + 1}_texto`, f.a),
+})))
 </script>
 
 <style scoped>

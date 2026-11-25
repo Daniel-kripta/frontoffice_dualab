@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ProbarWebhookRequest;
 use App\Http\Requests\Admin\UpdateAjustesRequest;
 use App\Jobs\EnviarFormularioAWebhook;
 use App\Models\Ajuste;
 use App\Services\ActividadService;
+use App\Services\VisibilidadService;
 use App\Models\Contacto;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -30,7 +32,31 @@ class AjusteController extends Controller
         'apariencia'    => 'aplicó cambios de apariencia en la web',
     ];
 
+    // Nombres en el historial (lo que se ve en el panel)
+    private const ETIQUETAS = [
+        'seo.titulo_sitio' => 'Nombre del sitio', 'seo.separador' => 'Separador', 'seo.descripcion' => 'Descripción por defecto',
+        'seo.imagen_og' => 'Imagen para redes', 'seo.indexar' => 'Buscadores pueden mostrar la web', 'seo.search_console' => 'Código de Search Console',
+        'seo.org_nombre' => 'Organización · Nombre', 'seo.org_logo' => 'Organización · Logo', 'seo.org_email' => 'Organización · Correo',
+        'seo.org_telefono' => 'Organización · Teléfono', 'seo.org_direccion' => 'Organización · Dirección', 'seo.org_codigo_postal' => 'Organización · Código postal',
+        'seo.org_localidad' => 'Organización · Localidad', 'seo.org_provincia' => 'Organización · Provincia', 'seo.org_redes' => 'Organización · Redes sociales',
+        'seo.ia_bloqueados' => 'IA bloqueadas', 'seo.llms_resumen' => 'Presentación para las IA',
+        'apariencia.paleta' => 'Paleta', 'apariencia.color_principal' => 'Color principal', 'apariencia.color_noche' => 'Color oscuro',
+        'apariencia.color_titulos' => 'Color de los títulos', 'apariencia.fuente_titulos' => 'Fuente de los títulos', 'apariencia.fuente_texto' => 'Fuente del texto',
+        'apariencia.tamano_texto' => 'Tamaño del texto', 'apariencia.logo' => 'Logo', 'apariencia.favicon' => 'Icono de la pestaña',
+        'analitica.ga4_id' => 'ID de Google Analytics', 'analitica.gtm_id' => 'ID de Tag Manager', 'analitica.activa' => 'Analítica activa',
+        'integraciones.crm_url' => 'CRM externo · Dirección', 'integraciones.crm_activo' => 'CRM externo · Activo', 'integraciones.crm_secreto' => 'CRM externo · Clave',
+        'integraciones.brevo_api_key' => 'Clave de Brevo', 'integraciones.brevo_lista_id' => 'Lista de Brevo',
+        'integraciones.mailchimp_api_key' => 'Clave de Mailchimp', 'integraciones.mailchimp_audiencia' => 'Audiencia de Mailchimp',
+    ];
+
     public function __construct(private ActividadService $actividad) {}
+
+    /** Valores del grupo, para el «antes → después» del historial. */
+    private function foto(string $grupo): array
+    {
+        return collect(config('cms.ajustes'))->filter(fn ($d, $k) => str_starts_with($k, "$grupo."))
+            ->map(fn ($d, $clave) => Ajuste::leer($clave))->all();
+    }
 
     public function show(string $grupo): JsonResponse
     {
@@ -44,12 +70,19 @@ class AjusteController extends Controller
                     : Ajuste::leer($clave),
             ]);
 
+        // Aviso a la app DuaLab: configurado en el servidor; el panel solo enseña si está conectado
+        if ($grupo === 'integraciones') {
+            $app = EnviarFormularioAWebhook::destino('webhook');
+            $ajustes['app_dualab'] = ['conectada' => (bool) $app, 'servidor' => $app ? parse_url($app['url'], PHP_URL_HOST) : null];
+        }
+
         return response()->json($ajustes);
     }
 
     public function update(UpdateAjustesRequest $request, string $grupo): JsonResponse
     {
         $this->autorizar($grupo);
+        $antes = $this->foto($grupo);
 
         foreach ($request->validated('ajustes') as $nombre => $valor) {
             $clave = "$grupo.$nombre";
@@ -60,7 +93,12 @@ class AjusteController extends Controller
             Ajuste::guardar($clave, $valor);
         }
         Cache::forget('web.configuracion');
-        $this->actividad->registrar($request->user(), $grupo === 'integraciones' ? 'integraciones' : $grupo, 'editar', self::DESCRIPCIONES[$grupo]);
+        VisibilidadService::olvidarCache();
+        // Los secretos nunca se copian al historial: solo que cambiaron
+        $secretos = collect(config('cms.ajustes'))->filter(fn ($d) => ! empty($d['secreto']))->keys()->all();
+        $etiquetas = collect(self::ETIQUETAS)->filter(fn ($e, $k) => str_starts_with($k, "$grupo."))->all();
+        $this->actividad->registrar($request->user(), $grupo === 'integraciones' ? 'integraciones' : $grupo, 'editar', self::DESCRIPCIONES[$grupo],
+            null, null, ActividadService::cambios($antes, $this->foto($grupo), $etiquetas, $secretos));
 
         return $this->show($grupo);
     }
@@ -78,13 +116,13 @@ class AjusteController extends Controller
         return $this->show($grupo);
     }
 
-    /** Envía un formulario de ejemplo al webhook para comprobar la conexión. */
-    public function probarWebhook(): JsonResponse
+    /** Envía un formulario de ejemplo (marcado como prueba) al destino elegido: la app o el CRM. */
+    public function probarWebhook(ProbarWebhookRequest $request): JsonResponse
     {
-        Gate::authorize('administrar-web');
-
-        $url = Ajuste::leer('integraciones.webhook_url');
-        abort_unless($url, 422, 'Primero guarda la URL del webhook.');
+        $destino = EnviarFormularioAWebhook::destino($request->validated('destino') ?? 'webhook', soloActivo: false);
+        abort_unless($destino, 422, ($request->validated('destino') ?? 'webhook') === 'webhook'
+            ? 'El aviso a la app DuaLab no está configurado en el servidor.' : 'Primero guarda la dirección.');
+        ['url' => $url, 'secreto' => $secreto] = $destino;
 
         $ejemplo = new Contacto([
             'nombre' => 'Prueba', 'apellidos' => 'DuaLab', 'email' => 'prueba@ejemplo.com',
@@ -92,8 +130,6 @@ class AjusteController extends Controller
         ]);
         $ejemplo->created_at = now();
         $cuerpo  = json_encode(['prueba' => true] + EnviarFormularioAWebhook::payload($ejemplo), JSON_UNESCAPED_UNICODE);
-        $secreto = Ajuste::leer('integraciones.webhook_secreto');
-
         try {
             $respuesta = Http::timeout(8)
                 ->withHeaders(array_filter(['X-DuaLab-Firma' => $secreto ? hash_hmac('sha256', $cuerpo, $secreto) : null]))

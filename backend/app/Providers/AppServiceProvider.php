@@ -34,11 +34,10 @@ class AppServiceProvider extends ServiceProvider
 
         // Panel de gestión web (/gestion-web): editores y administradores. Idiomas,
         // ajustes de analítica e integraciones, solo administradores.
-        // Panel de gestión web: entrar (todos sus roles), contenido (admin y editor),
-        // formularios (admin, editor y atención de contactos) y administración (admin)
+        // Panel de gestión web: entrar (todos sus roles), contenido (admin y editor) y administración
+        // (admin). Formularios y correo se atienden en DuaLab Central (API integraciones/central)
         Gate::define('entrar-panel', fn (User $user) => in_array($user->role, config('cms.roles_panel'), true));
         Gate::define('gestionar-web', fn (User $user) => in_array($user->role, config('cms.roles_contenido'), true));
-        Gate::define('atender-contactos', fn (User $user) => in_array($user->role, config('cms.roles_contactos'), true));
         Gate::define('administrar-web', fn (User $user) => in_array($user->role, config('cms.roles_admin'), true));
 
         RateLimiter::for('login', function (Request $request) {

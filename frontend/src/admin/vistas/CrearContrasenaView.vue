@@ -4,7 +4,7 @@
   <div class="gw-panel flex min-h-dvh items-center justify-center bg-azul-noche px-4 py-10">
     <div class="w-full max-w-md">
       <div class="mb-6 flex items-center justify-center gap-3 text-white">
-        <img :src="logo" alt="" class="h-12 w-auto" />
+        <img :src="logo" alt="" class="h-12 w-12 shrink-0 rounded-[22%] ring-1 ring-white/25" />
         <div>
           <p class="font-heading text-xl font-bold leading-tight">DuaLab</p>
           <p class="text-sm text-white/70">Gestión de la web</p>
@@ -67,8 +67,8 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { CheckCircleIcon, EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
-import '../panel.css'
-import logo from '@/assets/logo_colores.png'
+// El icono del panel (el mismo que el favicon y la barra superior)
+import logo from '@/assets/gestion-web-barra.png'
 import { sesionService } from '@/services/admin/sesionService'
 import { mensajeError } from '@/services/admin/panelApi'
 

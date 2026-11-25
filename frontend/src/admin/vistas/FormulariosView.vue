@@ -139,6 +139,19 @@
           </dd>
         </div>
       </dl>
+      <section v-if="detalle.respuestas?.length" class="mt-6 border-t border-gray-100 pt-4" aria-label="Respuestas enviadas">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-texto-secundario">Respuestas por correo</h3>
+        <ul class="mt-2 grid gap-2">
+          <li v-for="r in detalle.respuestas" :key="r.id" class="flex flex-wrap items-baseline gap-x-2 text-sm text-azul-noche">
+            <PaperAirplaneIcon class="h-4 w-4 shrink-0 self-center text-texto-secundario" aria-hidden="true" />
+            <span class="min-w-0 break-words font-semibold">{{ r.asunto }}</span>
+            <span class="text-texto-secundario">{{ fechaHora(r.fecha) }}<template v-if="r.por"> · {{ r.por }}</template></span>
+            <span v-if="r.estado !== 'enviado'" class="gw-chip" :class="r.estado === 'error' ? 'bg-red-50 text-red-700' : 'bg-sky-50 text-sky-800'">
+              {{ r.estado === 'error' ? 'No se envió' : 'Enviándose' }}
+            </span>
+          </li>
+        </ul>
+      </section>
     </template>
     <template #pie>
       <button type="button" class="gw-accion-peligro mr-auto" @click="eliminar">Eliminar</button>
@@ -146,27 +159,34 @@
       <button type="button" class="gw-accion-secundaria" @click="cambiarEstado(detalle?.estado === 'archivado' ? 'leido' : 'archivado')">
         {{ detalle?.estado === 'archivado' ? 'Sacar del archivo' : 'Archivar' }}
       </button>
-      <a v-if="detalle" :href="`mailto:${detalle.email}`" class="gw-accion-principal">
+      <!-- El correo del panel es solo del admin; el resto responde con su programa de correo -->
+      <button v-if="detalle && sesion.esAdmin" type="button" class="gw-accion-principal" @click="responderPorCorreo">
+        <EnvelopeIcon class="h-4 w-4" aria-hidden="true" /> Responder por correo
+      </button>
+      <a v-else-if="detalle" :href="`mailto:${detalle.email}`" class="gw-accion-principal">
         <EnvelopeIcon class="h-4 w-4" aria-hidden="true" /> Responder
       </a>
     </template>
   </VentanaModal>
+
+  <RedactarCorreo :abierto="!!respondiendo" :contacto="respondiendo" @cerrar="respondiendo = null" @enviado="alResponder" />
 </template>
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
-  ArrowDownTrayIcon, ArrowTopRightOnSquareIcon, EnvelopeIcon, InboxIcon, LinkIcon, MagnifyingGlassIcon, ShieldCheckIcon,
+  ArrowDownTrayIcon, ArrowTopRightOnSquareIcon, EnvelopeIcon, InboxIcon, LinkIcon, MagnifyingGlassIcon, PaperAirplaneIcon, ShieldCheckIcon,
 } from '@heroicons/vue/24/outline'
 import CabeceraPanel from '../componentes/CabeceraPanel.vue'
 import Paginacion from '../componentes/Paginacion.vue'
 import VentanaModal from '../componentes/VentanaModal.vue'
+import RedactarCorreo from '../componentes/RedactarCorreo.vue'
 import { formulariosService } from '@/services/admin/formulariosService'
 import { mensajeError } from '@/services/admin/panelApi'
 import { useAvisos } from '../composables/useAvisos'
 import { usePanelSesion } from '@/stores/panelSesion'
-import { fechaHora, haceCuanto } from '../utilidades'
+import { COLORES_FORMULARIO, fechaHora, haceCuanto } from '../utilidades'
 
 const route = useRoute()
 const router = useRouter()
@@ -241,6 +261,20 @@ async function cambiarEstado(estado) {
   } catch (e) { avisos.error(mensajeError(e)) }
 }
 
+// Responder por correo desde el panel (solo admin): se cierra la ficha y se abre el editor
+const respondiendo = ref(null)
+function responderPorCorreo() {
+  const d = detalle.value
+  respondiendo.value = { id: d.id, email: d.email, nombre: d.nombre, asunto: 'Tu solicitud en DuaLab' }
+  cerrarDetalle()
+}
+function alResponder() {
+  const id = respondiendo.value?.id
+  respondiendo.value = null
+  cargar(meta.value?.current_page ?? 1)
+  if (id) abrir(id) // la ficha ya muestra la respuesta
+}
+
 async function eliminar() {
   if (!window.confirm('¿Eliminar este envío para siempre? Si solo quieres quitarlo de la bandeja, archívalo.')) return
   try {
@@ -262,11 +296,7 @@ async function exportar() {
   }
 }
 
-const COLORES_FORM = {
-  rapido: 'bg-primary-100 text-primary-700', centro: 'bg-centros/10 text-centros', empresa: 'bg-empresas/10 text-[#3D7A1E]',
-  alumno: 'bg-alumnos/15 text-[#B85E0A]', administracion: 'bg-administraciones/10 text-[#0F7C7D]',
-}
-const claseFormulario = f => COLORES_FORM[f] ?? 'bg-gray-100 text-gray-700'
+const claseFormulario = f => COLORES_FORMULARIO[f] ?? 'bg-gray-100 text-gray-700'
 
 // Campos propios de cada formulario (columna `datos`) con nombre legible
 const ETIQUETAS = {

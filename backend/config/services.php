@@ -35,6 +35,20 @@ return [
         ],
     ],
 
+    // API firmada para DuaLab Central (espacio «Primer contacto»: la bandeja de formularios vista
+    // desde Central). El mismo valor va en el .env de la app DuaLab (FRONTOFFICE_CENTRAL_SECRETO).
+    'central' => [
+        'secreto' => env('CENTRAL_API_SECRETO'),
+    ],
+
+    // Aviso a la app DuaLab de cada formulario de empresa o centro → posible empresa o centro
+    // (captación) en Central. Configuración fija del servidor, como la de Central: la clave es la
+    // misma que FRONTOFFICE_WEBHOOK_SECRETO en el .env de la app. Ver EnviarFormularioAWebhook.
+    'app_dualab' => [
+        'webhook_url'     => env('APP_DUALAB_WEBHOOK_URL'),
+        'webhook_secreto' => env('APP_DUALAB_WEBHOOK_SECRETO'),
+    ],
+
     // Biblioteca de medios del panel de gestión web (misma cuenta que la app DuaLab,
     // otra carpeta). Sin estas variables, los archivos se guardan en el disco local.
     'cloudinary' => [

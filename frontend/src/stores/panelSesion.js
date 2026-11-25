@@ -15,8 +15,7 @@ export const usePanelSesion = defineStore('panelSesion', {
     rol: s => s.usuario?.role ?? null,
     // Sin lista de roles = cualquiera del panel
     puede: s => roles => !roles || roles.includes(s.usuario?.role),
-    // Primera pantalla: «contactos» no ve el Escritorio (es de contenido)
-    inicio: s => (s.usuario?.role === 'contactos' ? { name: 'panel-formularios' } : { name: 'panel-escritorio' }),
+    inicio: () => ({ name: 'panel-escritorio' }),
   },
   actions: {
     async init() {

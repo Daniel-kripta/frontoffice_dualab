@@ -34,7 +34,7 @@ class Entrada extends Model
 
     protected static function booted(): void
     {
-        $olvidar = fn () => Cache::forget('web.sitemap');
+        $olvidar = fn () => Cache::deleteMultiple(['web.sitemap', 'web.llms']);
         static::saved($olvidar);
         static::deleted($olvidar);
         static::restored($olvidar);

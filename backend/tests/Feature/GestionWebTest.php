@@ -9,6 +9,7 @@ use App\Models\Entrada;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -147,21 +148,20 @@ class GestionWebTest extends TestCase
         Contacto::create(['nombre' => 'Ana', 'email' => 'ana@x.com', 'tipo' => 'centro', 'accion' => 'demo', 'pagina_origen' => '/centros']);
         $rapido = Contacto::create(['nombre' => '=HYPERLINK("x")', 'email' => 'b@x.com', 'tipo' => 'empresa']);
 
-        $this->actingAs($admin)->getJson('/api/admin/formularios?formulario=centro')
+        $this->central()->getJson('/api/integraciones/central/formularios?formulario=centro')
             ->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.formulario', 'centro');
 
-        $this->actingAs($admin)->getJson("/api/admin/formularios/{$rapido->id}")
+        $this->central()->getJson("/api/integraciones/central/formularios/{$rapido->id}")
             ->assertOk()->assertJsonPath('formulario', 'rapido')->assertJsonPath('estado', 'leido');
 
-        $csv = $this->actingAs($admin)->get('/api/admin/formularios/exportar')->assertOk()->streamedContent();
+        $csv = $this->central()->get('/api/integraciones/central/formularios/exportar')->assertOk()->streamedContent();
         $this->assertStringContainsString("'=HYPERLINK", $csv); // fórmula neutralizada
     }
 
     public function test_formulario_publico_guarda_pagina_origen_y_encola_webhook(): void
     {
         Queue::fake();
-        Ajuste::guardar('integraciones.webhook_url', 'https://hooks.ejemplo.com/x');
-        Ajuste::guardar('integraciones.webhook_activo', true);
+        config(['services.app_dualab.webhook_url' => 'https://api.dualab.es/api/integraciones/frontoffice/formularios']);
 
         $this->postJson('/api/contacto', [
             'nombre' => 'Luis', 'email' => 'luis@x.com', 'tipo' => 'empresa', 'pagina_origen' => '/',
@@ -169,6 +169,55 @@ class GestionWebTest extends TestCase
 
         $this->assertDatabaseHas('contactos', ['email' => 'luis@x.com', 'pagina_origen' => '/', 'estado' => 'nuevo']);
         Queue::assertPushed(EnviarFormularioAWebhook::class);
+    }
+
+    public function test_formulario_avisa_a_la_app_y_al_crm_por_separado(): void
+    {
+        Queue::fake();
+        // La app, desde el .env del servidor; el CRM, desde el panel
+        config(['services.app_dualab.webhook_url' => 'https://api.dualab.es/api/integraciones/frontoffice/formularios',
+            'services.app_dualab.webhook_secreto' => 'clave-compartida-con-la-app']);
+        Ajuste::guardar('integraciones.crm_url', 'https://hooks.crm.ejemplo.com/x');
+        Ajuste::guardar('integraciones.crm_activo', false);
+
+        $this->postJson('/api/contacto', ['nombre' => 'Luis', 'email' => 'luis@x.com', 'tipo' => 'empresa', 'pagina_origen' => '/'])->assertCreated();
+        Queue::assertPushed(EnviarFormularioAWebhook::class, 1);
+        Queue::assertPushed(EnviarFormularioAWebhook::class, fn ($j) => $j->destino === 'webhook');
+
+        // Con el CRM activo, dos avisos independientes (cada uno con sus reintentos)
+        Ajuste::guardar('integraciones.crm_activo', true);
+        $this->postJson('/api/contacto', ['nombre' => 'Eva', 'email' => 'eva@x.com', 'tipo' => 'centro', 'pagina_origen' => '/'])->assertCreated();
+        Queue::assertPushed(EnviarFormularioAWebhook::class, fn ($j) => $j->destino === 'crm');
+        Queue::assertPushed(EnviarFormularioAWebhook::class, 3);
+    }
+
+    public function test_probar_conexion_va_marcado_como_prueba_al_destino_elegido(): void
+    {
+        \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response(['recibido' => true], 200)]);
+        $admin = $this->usuario('admin');
+        Ajuste::guardar('integraciones.crm_url', 'https://hooks.crm.ejemplo.com/x');
+        Ajuste::guardar('integraciones.crm_secreto', 'clave-del-crm-de-prueba');
+
+        $this->actingAs($admin)->postJson('/api/admin/ajustes/integraciones/probar-webhook', ['destino' => 'crm'])->assertOk()->assertJsonPath('ok', true);
+        \Illuminate\Support\Facades\Http::assertSent(fn ($r) => $r->url() === 'https://hooks.crm.ejemplo.com/x' && $r['prueba'] === true
+            && $r->header('X-DuaLab-Firma')[0] === hash_hmac('sha256', $r->body(), 'clave-del-crm-de-prueba'));
+
+        // Sin la app configurada en el servidor, no se prueba; el panel lo dice
+        $this->actingAs($admin)->postJson('/api/admin/ajustes/integraciones/probar-webhook')->assertStatus(422)
+            ->assertJsonPath('message', 'El aviso a la app DuaLab no está configurado en el servidor.');
+        $this->actingAs($admin)->getJson('/api/admin/ajustes/integraciones')->assertJsonPath('app_dualab.conectada', false);
+
+        // La dirección de la app ya no se cambia desde el panel
+        $this->actingAs($admin)->putJson('/api/admin/ajustes/integraciones', ['ajustes' => ['webhook_url' => 'https://otra.web/x']])->assertUnprocessable();
+
+        // Lo que se guardó en el panel antes de pasar al .env sigue funcionando hasta que el .env lo tenga
+        Ajuste::guardar('integraciones.webhook_url', 'https://api.dualab.es/api/integraciones/frontoffice/formularios');
+        Ajuste::guardar('integraciones.webhook_activo', true);
+        $this->actingAs($admin)->getJson('/api/admin/ajustes/integraciones')
+            ->assertJsonPath('app_dualab', ['conectada' => true, 'servidor' => 'api.dualab.es']);
+        $this->actingAs($admin)->postJson('/api/admin/ajustes/integraciones/probar-webhook')->assertOk();
+        $this->actingAs($admin)->postJson('/api/admin/ajustes/integraciones/probar-webhook', ['destino' => 'otro'])->assertUnprocessable();
+        $this->actingAs($this->usuario('editor'))->postJson('/api/admin/ajustes/integraciones/probar-webhook')->assertForbidden();
     }
 
     public function test_secretos_cifrados_y_nunca_devueltos(): void
@@ -372,5 +421,25 @@ class GestionWebTest extends TestCase
                 'consumo' => ['plan' => 'Free', 'creditos_usados' => 0.18, 'creditos_limite' => 25, 'archivos' => 180]]);
         $this->assertStringNotContainsString('secreto-xyz', $r->getContent());
         $this->assertStringNotContainsString('clave-publica', $r->getContent());
+    }
+
+    public function test_web_publica_sale_igual_desde_la_cache_en_disco(): void
+    {
+        // Como en producción: caché en archivo, que no deserializa objetos (cache.serializable_classes = false)
+        $carpeta = storage_path('framework/cache/test-'.uniqid());
+        config(['cache.default' => 'file', 'cache.stores.file.path' => $carpeta]);
+
+        try {
+            foreach ([1, 2] as $vez) { // la segunda vez sale de la caché
+                $config = $this->getJson('/api/web/configuracion')->assertOk()->assertDontSee('__PHP_Incomplete_Class');
+                $this->assertIsList($config->json('idiomas'));
+                $this->assertArrayHasKey('apariencia.paleta', $config->json('ajustes'));
+
+                $pagina = $this->getJson('/api/web/paginas/centros')->assertOk()->assertDontSee('__PHP_Incomplete_Class');
+                $this->assertStringContainsString('"valores":{}', $pagina->getContent(), "lectura $vez");
+            }
+        } finally {
+            File::deleteDirectory($carpeta);
+        }
     }
 }

@@ -1,6 +1,7 @@
-<!-- Registro de actividad (solo admin): quién aporta qué en el panel, agrupado por día. -->
+<!-- Historial (solo admin): quién ha hecho qué en el panel, agrupado por día. Cada acción se abre
+     con su detalle (qué cambió). Mismo nombre que el Historial de DuaLab Central. -->
 <template>
-  <CabeceraPanel antetitulo="Equipo" titulo="Actividad" subtitulo="Quién ha hecho qué en el panel y cuándo. Se guarda durante 2 años." />
+  <CabeceraPanel antetitulo="Equipo" titulo="Historial de actividad" subtitulo="Quién ha hecho qué en el panel y cuándo. Pulsa una acción para ver qué cambió. Se guarda durante 2 años." />
 
   <div class="gw-tarjeta mb-4 grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_10rem_10rem_auto] xl:items-end">
     <div>
@@ -36,29 +37,36 @@
     <section v-for="d in dias" :key="d.clave" class="gw-tarjeta overflow-hidden">
       <h2 class="border-b border-gray-100 bg-gray-50 px-4 py-2 text-xs font-bold uppercase tracking-wide text-texto-secundario">{{ d.titulo }}</h2>
       <ul class="divide-y divide-gray-100">
-        <li v-for="a in d.items" :key="a.id" class="flex items-start gap-3 p-4">
-          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-azul-noche text-xs font-bold text-white" aria-hidden="true">{{ inicial(a.usuario.nombre) }}</span>
-          <div class="min-w-0 flex-1">
-            <p class="break-words text-sm text-azul-noche">
-              <strong>{{ a.usuario.nombre }}</strong> {{ a.descripcion }}
-            </p>
-            <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-texto-secundario">
-              <span>{{ hora(a.fecha) }}</span>
-              <span class="gw-chip bg-gray-100 text-texto-secundario">{{ a.seccion_nombre }}</span>
-              <RouterLink v-if="enlace(a)" :to="enlace(a)" class="gw-enlace">Ver</RouterLink>
-            </p>
-          </div>
+        <li v-for="a in d.items" :key="a.id">
+          <!-- Fila a todo el ancho (excepción de forma): se abre el detalle -->
+          <button type="button" class="flex w-full items-start gap-3 p-4 text-left hover:bg-gray-50 focus-visible:bg-gray-50" @click="abierta = a">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-azul-noche text-xs font-bold text-white" aria-hidden="true">{{ inicial(a.usuario.nombre) }}</span>
+            <span class="min-w-0 flex-1">
+              <span class="block break-words text-sm text-azul-noche">
+                <strong>{{ a.usuario.nombre }}</strong> {{ a.descripcion }}
+              </span>
+              <span class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-texto-secundario">
+                <span>{{ hora(a.fecha) }}</span>
+                <span class="gw-chip bg-gray-100 text-texto-secundario">{{ a.seccion_nombre }}</span>
+                <span v-if="a.detalle?.length" class="gw-chip bg-primary-100 text-primary-700">{{ a.detalle.length }} {{ a.detalle.length === 1 ? 'cambio' : 'cambios' }}</span>
+              </span>
+            </span>
+            <ChevronRightIcon class="mt-2 h-4 w-4 shrink-0 text-gray-400" aria-hidden="true" />
+          </button>
         </li>
       </ul>
     </section>
   </div>
   <Paginacion class="mt-4" :meta="meta" @ir="cargar" />
+  <DetalleActividad :accion="abierta" @cerrar="abierta = null" />
 </template>
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { ChevronRightIcon } from '@heroicons/vue/24/outline'
 import CabeceraPanel from '../componentes/CabeceraPanel.vue'
+import DetalleActividad from '../componentes/DetalleActividad.vue'
 import Paginacion from '../componentes/Paginacion.vue'
 import { actividadService } from '@/services/admin/actividadService'
 import { mensajeError } from '@/services/admin/panelApi'
@@ -72,6 +80,7 @@ const meta = ref(null)
 const personas = ref([])
 const secciones = ref({})
 const cargando = ref(true)
+const abierta = ref(null) // acción con el detalle abierto
 const filtros = reactive({ user_id: typeof route.query.user_id === 'string' ? route.query.user_id : '', seccion: '', desde: '', hasta: '' })
 const hayFiltros = computed(() => Object.values(filtros).some(Boolean))
 
@@ -95,18 +104,6 @@ const dias = computed(() => {
   }
   return grupos
 })
-
-// Enlace al elemento afectado, si sigue existiendo un sitio donde verlo
-function enlace(a) {
-  if (!a.objeto) return null
-  return {
-    pagina: { name: 'panel-pagina', params: { clave: a.objeto.ref } },
-    entrada: { name: 'panel-entrada', params: { id: a.objeto.ref } },
-    medio: { name: 'panel-medios' },
-    formulario: { name: 'panel-formularios' },
-    usuario: { name: 'panel-usuarios' },
-  }[a.objeto.tipo] ?? null
-}
 
 async function cargar(pagina = 1) {
   cargando.value = true

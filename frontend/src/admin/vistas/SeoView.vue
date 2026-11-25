@@ -1,5 +1,5 @@
 <template>
-  <CabeceraPanel antetitulo="Visibilidad" titulo="SEO" subtitulo="Ajustes generales de buscadores y redes sociales (lo que hacía All in One SEO). El SEO de cada página o entrada se edita en ella." />
+  <CabeceraPanel antetitulo="Visibilidad" titulo="SEO" subtitulo="Ajustes generales de Google y redes sociales (lo que hacía All in One SEO). El SEO de cada página o entrada se edita en ella; lo de las IA, en GEO (IA)." />
 
   <div v-if="cargando" class="gw-tarjeta h-64 animate-pulse" aria-busy="true" />
   <div v-else class="grid gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
@@ -32,7 +32,7 @@
         <input v-model="form.indexar" type="checkbox" role="switch" class="gw-interruptor mt-0.5" />
         <span>
           <span class="block text-sm font-semibold text-azul-noche">Permitir que los buscadores muestren la web</span>
-          <span class="gw-ayuda block">{{ form.indexar ? 'Activado: lo normal en producción.' : 'Desactivado: ninguna página aparecerá en Google. Úsalo solo en pruebas.' }}</span>
+          <span class="gw-ayuda block">{{ form.indexar ? 'Activado: lo normal en producción.' : 'Desactivado: ninguna página aparecerá en Google ni en las IA. Úsalo solo en pruebas.' }}</span>
         </span>
       </label>
       <div v-if="sesion.esAdmin">
@@ -46,12 +46,18 @@
 
     <div class="space-y-6">
       <section class="gw-tarjeta p-5">
-        <h2 class="font-heading text-base font-bold text-azul-noche">Sitemap</h2>
-        <p class="mt-1 text-sm text-texto-secundario">Se genera solo con las páginas publicadas y las noticias. Envíalo a Google Search Console.</p>
-        <div class="mt-3 flex gap-2">
-          <input :value="sitemap" type="text" readonly class="gw-campo bg-gray-50" aria-label="Dirección del sitemap" @focus="$event.target.select()" />
-          <a :href="sitemap" target="_blank" rel="noopener" class="gw-accion-icono" aria-label="Abrir sitemap" title="Abrir"><ArrowTopRightOnSquareIcon class="h-5 w-5" aria-hidden="true" /></a>
-        </div>
+        <h2 class="font-heading text-base font-bold text-azul-noche">Archivos para buscadores</h2>
+        <p class="mt-1 text-sm text-texto-secundario">Se generan solos con lo que hay en el panel. Envía el sitemap a Google Search Console.</p>
+        <ul class="mt-3 space-y-3">
+          <li v-for="a in archivos" :key="a.url">
+            <p class="text-sm font-semibold text-azul-noche">{{ a.titulo }}</p>
+            <div class="mt-1 flex gap-2">
+              <input :value="a.url" type="text" readonly class="gw-campo bg-gray-50" :aria-label="`Dirección de ${a.titulo}`" @focus="$event.target.select()" />
+              <a :href="a.url" target="_blank" rel="noopener" class="gw-accion-icono shrink-0" :aria-label="`Abrir ${a.titulo}`" title="Abrir"><ArrowTopRightOnSquareIcon class="h-5 w-5" aria-hidden="true" /></a>
+            </div>
+            <p class="gw-ayuda">{{ a.ayuda }}</p>
+          </li>
+        </ul>
       </section>
       <section class="gw-tarjeta p-5">
         <h2 class="font-heading text-base font-bold text-azul-noche">Páginas con el SEO a medias</h2>
@@ -80,18 +86,28 @@ import { usePanelSesion } from '@/stores/panelSesion'
 
 const avisos = useAvisos()
 const sesion = usePanelSesion()
-// search_console solo lo cambia el admin: el editor no lo envía (el backend lo rechazaría)
-const form = reactive({ titulo_sitio: '', separador: '|', descripcion: '', imagen_og: '', indexar: true, search_console: '' })
+
+// Solo estos ajustes del grupo seo: los de la organización y las IA se guardan en GEO (IA)
+const VACIO = { titulo_sitio: '', separador: '|', descripcion: '', imagen_og: '', indexar: true, search_console: '' }
+// Solo lo cambia el admin: el editor no lo envía (el backend lo rechazaría)
+const SOLO_ADMIN = ['search_console']
+
+const form = reactive(structuredClone(VACIO))
 const paginas = ref([])
 const cargando = ref(true)
 const guardando = ref(false)
 const errores = ref({})
 
-const sitemap = `${(import.meta.env.VITE_API_URL ?? `${window.location.origin}/api`).replace(/\/$/, '')}/web/sitemap.xml`
+// En producción el panel está en dualab.es, así que son las direcciones públicas
+// (en local, vite.config.js las pasa al backend)
+const archivos = [
+  { titulo: 'Sitemap', url: `${window.location.origin}/sitemap.xml`, ayuda: 'Páginas publicadas y noticias. Envíalo a Search Console.' },
+  { titulo: 'robots.txt', url: `${window.location.origin}/robots.txt`, ayuda: 'Qué buscadores e IA pueden leer la web (las IA se eligen en GEO).' },
+]
 const pendientes = computed(() => paginas.value.filter(p => p.ruta && !p.ruta.includes(':') && !p.seo_completo))
 
 function aplicar(d) {
-  Object.assign(form, { titulo_sitio: d.titulo_sitio ?? '', separador: d.separador ?? '|', descripcion: d.descripcion ?? '', imagen_og: d.imagen_og ?? '', indexar: d.indexar ?? true, search_console: d.search_console ?? '' })
+  for (const [clave, defecto] of Object.entries(VACIO)) form[clave] = d[clave] ?? defecto
 }
 
 onMounted(async () => {
@@ -107,9 +123,9 @@ async function guardar() {
   guardando.value = true
   errores.value = {}
   try {
-    const { search_console: codigo, ...comunes } = form
-    const datos = { ...comunes, imagen_og: form.imagen_og || null }
-    if (sesion.esAdmin) datos.search_console = codigo || null
+    const datos = Object.fromEntries(Object.entries(form)
+      .filter(([clave]) => sesion.esAdmin || !SOLO_ADMIN.includes(clave))
+      .map(([clave, valor]) => [clave, valor === '' ? null : valor]))
     aplicar(await ajustesService.guardar('seo', datos))
     avisos.ok('Ajustes de SEO guardados.')
   } catch (e) {

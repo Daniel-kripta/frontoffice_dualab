@@ -34,12 +34,14 @@ class CategoriaController extends Controller
 
     public function update(UpdateCategoriaRequest $request, Categoria $categoria): CategoriaResource
     {
+        $antes = $categoria->only(['nombre', 'color']);
         $categoria->fill($request->validated());
         if ($categoria->isDirty('nombre')) {
             $categoria->slug = $this->slugUnico($categoria->nombre, $categoria->id);
         }
         $categoria->save();
-        $this->actividad->registrar($request->user(), 'categorias', 'editar', 'editó la categoría '.ActividadService::cita($categoria->nombre));
+        $this->actividad->registrar($request->user(), 'categorias', 'editar', 'editó la categoría '.ActividadService::cita($categoria->nombre), null, null,
+            ActividadService::cambios($antes, $categoria->only(['nombre', 'color']), ['nombre' => 'Nombre', 'color' => 'Color']));
 
         return new CategoriaResource($categoria);
     }

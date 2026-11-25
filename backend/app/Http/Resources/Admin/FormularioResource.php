@@ -30,6 +30,14 @@ class FormularioResource extends JsonResource
             'estado'            => $this->estado,
             'leido_en'          => $this->leido_en,
             'created_at'        => $this->created_at,
+            // Correos que se le han enviado desde el panel (Correo → responder a un formulario)
+            'respuestas'        => $this->when($request->routeIs('admin.formularios.show'), fn () => $this->respuestas->map(fn ($e) => [
+                'id'         => $e->id,
+                'asunto'     => $e->asunto,
+                'estado'     => $e->estado,
+                'fecha'      => $e->enviado_en ?? $e->created_at,
+                'por'        => $e->usuario?->name,
+            ])),
         ];
     }
 }

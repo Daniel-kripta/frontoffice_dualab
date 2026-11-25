@@ -1,5 +1,7 @@
 <template>
-  <div class="pointer-events-none fixed bottom-20 right-4 sm:bottom-4 z-[60] flex max-h-[70vh] w-[min(24rem,calc(100vw-2rem))] flex-col gap-2 overflow-y-auto"
+  <!-- Con el aviso «Hay una versión nueva» (abajo a la derecha en escritorio), los avisos suben encima -->
+  <div class="pointer-events-none fixed bottom-20 right-4 z-[60] flex max-h-[70vh] w-[min(24rem,calc(100vw-2rem))] flex-col gap-2 overflow-y-auto"
+       :class="hayNuevaVersion ? 'sm:bottom-56' : 'sm:bottom-4'"
        aria-live="polite" role="status">
     <TransitionGroup name="gw-aviso">
       <div v-for="a in avisos" :key="a.id"
@@ -20,8 +22,10 @@
 <script setup>
 import { CheckCircleIcon, ExclamationCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { useAvisos } from '../composables/useAvisos'
+import { useNuevaVersion } from '@/composables/useNuevaVersion'
 
 const { avisos, cerrar } = useAvisos()
+const { hayNuevaVersion } = useNuevaVersion()
 </script>
 
 <style scoped>

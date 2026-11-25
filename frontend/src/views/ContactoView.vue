@@ -4,7 +4,7 @@
   <section ref="seccionForm" class="bg-superficie pt-8 pb-8 md:pt-12 md:pb-12 px-4 sm:px-6 scroll-mt-16">
     <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-6 md:gap-8 lg:gap-12">
       <!-- Columna izquierda: no cambia de tamaño al cambiar de agente (ver ContactoHero) -->
-      <ContactoHero :agentes="AGENTES_DISPONIBLES" :activo="tipo" class="min-w-0" />
+      <ContactoHero :agentes="agentesHero" :activo="tipo" :antetitulo="p.t('hero.antetitulo', 'Contacto')" class="min-w-0" />
 
       <div class="min-w-0 bg-white rounded-2xl shadow-[0_10px_40px_rgba(23,40,62,0.08)] p-4 sm:p-5 lg:px-6 lg:py-5 form-compacto">
         <ContactoStepper :pasos="agente.pasos" :completados="completados" class="mb-4" />
@@ -63,7 +63,7 @@
                     </CampoForm>
                     <CampoForm :id="`${t}-provincia`" label="Provincia" required :error="err('provincia')">
                       <select :id="`${t}-provincia`" v-model="d.centro.provincia" class="form-input bg-white" required>
-                        <option v-for="p in PROVINCIAS" :key="p">{{ p }}</option>
+                        <option v-for="prov in PROVINCIAS" :key="prov">{{ prov }}</option>
                       </select>
                     </CampoForm>
                     <CampoForm :id="`${t}-municipio`" label="Municipio" required :error="err('municipio')">
@@ -96,7 +96,7 @@
                     </CampoForm>
                     <CampoForm :id="`${t}-provincia`" label="Provincia" required :error="err('provincia')">
                       <select :id="`${t}-provincia`" v-model="d.empresa.provincia" class="form-input bg-white" required>
-                        <option v-for="p in PROVINCIAS" :key="p">{{ p }}</option>
+                        <option v-for="prov in PROVINCIAS" :key="prov">{{ prov }}</option>
                       </select>
                     </CampoForm>
                     <CampoForm :id="`${t}-municipio`" label="Municipio" required :error="err('municipio')">
@@ -202,7 +202,7 @@
                     </CampoForm>
                     <CampoForm :id="`${t}-provincia`" label="Provincia" required :error="err('provincia')">
                       <select :id="`${t}-provincia`" v-model="d.administracion.provincia" class="form-input bg-white" required>
-                        <option v-for="p in PROVINCIAS" :key="p">{{ p }}</option>
+                        <option v-for="prov in PROVINCIAS" :key="prov">{{ prov }}</option>
                       </select>
                     </CampoForm>
                     <CampoForm :id="`${t}-municipio`" label="Municipio" required :error="err('municipio')">
@@ -327,7 +327,6 @@ const MENSAJES_EXITO = {
 // Solo agentes disponibles (no bloqueados); cualquier otro valor → centro.
 // Agentes que se pueden elegir (los bloqueados no tienen formulario)
 const TIPOS_DISPONIBLES = TIPOS.filter((t) => !AGENTES[t].bloqueado)
-const AGENTES_DISPONIBLES = Object.fromEntries(TIPOS_DISPONIBLES.map((t) => [t, AGENTES[t]]))
 const tipoValido = (t) => (AGENTES[t] && !AGENTES[t].bloqueado ? t : null)
 const tipo = ref(tipoValido(route.query.tipo) ?? 'centro')
 const agente = computed(() => AGENTES[tipo.value])
@@ -360,8 +359,8 @@ const d = reactive(inicial.d)
 
 // Al cambiar de provincia, el municipio elegido deja de ser válido
 for (const t of ['centro', 'empresa', 'administracion']) {
-  watch(() => d[t].provincia, (p) => {
-    if (!MUNICIPIOS[p]?.includes(d[t].municipio)) d[t].municipio = ''
+  watch(() => d[t].provincia, (prov) => {
+    if (!MUNICIPIOS[prov]?.includes(d[t].municipio)) d[t].municipio = ''
   })
 }
 
@@ -372,10 +371,10 @@ const lleno = (...vals) => vals.every((v) => (Array.isArray(v) ? v.length > 0 : 
 
 const completados = computed(() => {
   const t = tipo.value
-  const p = persona
+  const pe = persona
   const datosOk = t === 'alumno'
-    ? lleno(p.nombre, p.apellidos, p.email, p.telefono, d.alumno.fecha_nacimiento)
-    : lleno(p.nombre, p.apellidos, p.cargo, p.email, p.telefono)
+    ? lleno(pe.nombre, pe.apellidos, pe.email, pe.telefono, d.alumno.fecha_nacimiento)
+    : lleno(pe.nombre, pe.apellidos, pe.cargo, pe.email, pe.telefono)
   const x = d[t]
   const seccionOk = {
     centro: () => lleno(x.centro_nombre, x.direccion, x.municipio, x.provincia, x.familias),
@@ -460,8 +459,29 @@ function reiniciar() {
   accion.value = 'info'
 }
 
-// SEO editable desde el panel de gestión web (config/cms_paginas.php → contacto)
-usePagina('contacto', { titulo: 'Contacto' })
+// SEO y textos de la columna izquierda editables desde el panel de gestión web
+// (config/cms_paginas.php → contacto). El formulario (etiquetas, ayudas, mensajes) no.
+const p = usePagina('contacto', { titulo: 'Contacto' })
+
+// Partes del título por posición: [0] inicio, [1] fragmento en color, [2] final (si lo hay)
+const CAMPOS_TITULO = ['titulo', 'destacado', 'titulo_final']
+
+// Columna izquierda de cada agente elegible con sus textos del panel (sección `agente_<tipo>`).
+// Icono, colores, imagen y rótulo manuscrito se quedan en contactoConfig.js.
+const agentesHero = computed(() => Object.fromEntries(TIPOS_DISPONIBLES.map((t) => {
+  const a = AGENTES[t]
+  const s = `agente_${t}`
+  return [t, {
+    ...a,
+    titulo: a.titulo.map((parte, i) => ({ ...parte, t: p.t(`${s}.${CAMPOS_TITULO[i]}`, parte.t) })),
+    intro: p.t(`${s}.descripcion`, a.intro),
+    beneficios: a.beneficios.map((b, i) => ({
+      ...b,
+      titulo: p.t(`${s}.item_${i + 1}_titulo`, b.titulo),
+      desc: p.t(`${s}.item_${i + 1}_texto`, b.desc),
+    })),
+  }]
+})))
 </script>
 
 <style scoped>

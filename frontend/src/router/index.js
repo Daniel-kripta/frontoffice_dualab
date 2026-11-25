@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { CONTACTOS, CONTENIDO, SOLO_ADMIN } from '@/admin/roles'
+import { CONTENIDO, SOLO_ADMIN } from '@/admin/roles'
 
 const routes = [
   {
@@ -110,15 +110,20 @@ const routes = [
       { path: 'entradas/nueva', name: 'panel-entrada-nueva', component: () => import('@/admin/vistas/EntradaEditorView.vue'), meta: { titulo: 'Nueva entrada', roles: CONTENIDO } },
       { path: 'entradas/categorias', name: 'panel-categorias', component: () => import('@/admin/vistas/CategoriasView.vue'), meta: { titulo: 'Categorías', roles: CONTENIDO } },
       { path: 'entradas/:id(\\d+)', name: 'panel-entrada', component: () => import('@/admin/vistas/EntradaEditorView.vue'), meta: { titulo: 'Editar entrada', roles: CONTENIDO } },
-      { path: 'formularios', name: 'panel-formularios', component: () => import('@/admin/vistas/FormulariosView.vue'), meta: { titulo: 'Formularios', roles: CONTACTOS } },
-      { path: 'formularios/integraciones', name: 'panel-integraciones', component: () => import('@/admin/vistas/IntegracionesView.vue'), meta: { titulo: 'Integraciones', roles: SOLO_ADMIN } },
+      // Formularios y Correo se atienden en DuaLab Central («Primer contacto»): los enlaces antiguos explican dónde
+      { path: 'formularios', name: 'panel-formularios', component: () => import('@/admin/vistas/EnCentralView.vue'), meta: { titulo: 'Formularios', roles: CONTENIDO } },
+      { path: 'formularios/integraciones', name: 'panel-integraciones', component: () => import('@/admin/vistas/IntegracionesView.vue'), meta: { titulo: 'Mailing y webhook', roles: SOLO_ADMIN } },
+      { path: 'correo', name: 'panel-correo', component: () => import('@/admin/vistas/EnCentralView.vue'), meta: { titulo: 'Correo', roles: CONTENIDO } },
       { path: 'medios', name: 'panel-medios', component: () => import('@/admin/vistas/MediosView.vue'), meta: { titulo: 'Medios', roles: CONTENIDO } },
       { path: 'perfil', name: 'panel-perfil', component: () => import('@/admin/vistas/PerfilView.vue'), meta: { titulo: 'Mi perfil' } },
       { path: 'idiomas', name: 'panel-idiomas', component: () => import('@/admin/vistas/IdiomasView.vue'), meta: { titulo: 'Idiomas', roles: SOLO_ADMIN } },
       { path: 'apariencia', name: 'panel-apariencia', component: () => import('@/admin/vistas/AparienciaView.vue'), meta: { titulo: 'Apariencia', roles: SOLO_ADMIN } },
       { path: 'seo', name: 'panel-seo', component: () => import('@/admin/vistas/SeoView.vue'), meta: { titulo: 'SEO', roles: CONTENIDO } },
+      { path: 'geo', name: 'panel-geo', component: () => import('@/admin/vistas/GeoView.vue'), meta: { titulo: 'GEO (IA)', roles: CONTENIDO } },
       { path: 'usuarios', name: 'panel-usuarios', component: () => import('@/admin/vistas/UsuariosView.vue'), meta: { titulo: 'Usuarios', roles: SOLO_ADMIN } },
-      { path: 'actividad', name: 'panel-actividad', component: () => import('@/admin/vistas/ActividadView.vue'), meta: { titulo: 'Actividad', roles: SOLO_ADMIN } },
+      { path: 'historial', name: 'panel-actividad', component: () => import('@/admin/vistas/ActividadView.vue'), meta: { titulo: 'Historial', roles: SOLO_ADMIN } },
+      // Antes se llamaba «Actividad»: los enlaces guardados siguen funcionando
+      { path: 'actividad', redirect: to => ({ name: 'panel-actividad', query: to.query }) },
       { path: 'analitica', name: 'panel-analitica', component: () => import('@/admin/vistas/AnaliticaView.vue'), meta: { titulo: 'Analítica', roles: SOLO_ADMIN } },
     ],
   },
@@ -156,6 +161,19 @@ router.beforeEach(async (to) => {
   if (!sesion.conSesion) return { name: 'panel-acceso', query: { redirect: to.fullPath } }
   if (!sesion.puedeEntrar) return { name: 'panel-acceso', query: { sinPermiso: '1' } }
   if (!sesion.puede(to.meta.roles)) return sesion.inicio
+})
+
+// El panel tiene su propio icono en la pestaña (turquesa con «W»): comparte build con la web
+// pública y sin esto se confundiría con ella. Al volver a la web se repone el de la web.
+const iconosWeb = {}
+router.afterEach((to) => {
+  const enPanel = to.matched.some(r => r.meta.panel)
+  for (const [rel, archivo] of [['icon', 'favicon.png'], ['apple-touch-icon', 'apple-touch-icon.png']]) {
+    const enlace = document.querySelector(`link[rel="${rel}"]`)
+    if (!enlace) continue
+    iconosWeb[rel] ??= enlace.getAttribute('href')
+    enlace.setAttribute('href', enPanel ? `${import.meta.env.BASE_URL}gestion-web-icono/${archivo}` : iconosWeb[rel])
+  }
 })
 
 export default router

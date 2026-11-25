@@ -28,15 +28,17 @@ class UsuariosPanelTest extends TestCase
         return $u;
     }
 
-    public function test_atencion_de_contactos_solo_ve_formularios(): void
+    // Atención al cliente ya no es un rol de Gestión web (trabaja en DuaLab Central): una cuenta que
+    // quedara con ese rol no entra en el panel, y no se puede crear
+    public function test_atencion_al_cliente_ya_no_entra_en_el_panel(): void
     {
-        $contactos = $this->usuario('contactos');
+        $contactos = $this->usuario('atencion_cliente');
 
-        $this->actingAs($contactos)->getJson('/api/admin/formularios')->assertOk()
-            ->assertJsonPath('avisos.buzon.email', 'info@dualab.es')
-            ->assertJsonPath('avisos.captacion.tipos', ['empresa', 'centro']);
-        $this->actingAs($contactos)->getJson('/api/admin/perfil')->assertOk();
+        $this->actingAs($contactos)->getJson('/api/admin/perfil')->assertForbidden();
         $this->actingAs($contactos)->getJson('/api/admin/escritorio')->assertForbidden();
+        $this->actingAs($this->usuario('admin'))->postJson('/api/admin/usuarios', [
+            'name' => 'Luis', 'email' => 'luis@dualab.es', 'role' => 'atencion_cliente', 'password' => self::CONTRASENA, 'password_confirmation' => self::CONTRASENA,
+        ])->assertUnprocessable()->assertJsonValidationErrors('role');
         $this->actingAs($contactos)->getJson('/api/admin/paginas')->assertForbidden();
         $this->actingAs($contactos)->getJson('/api/admin/medios')->assertForbidden();
         $this->actingAs($contactos)->getJson('/api/admin/usuarios')->assertForbidden();
@@ -76,7 +78,7 @@ class UsuariosPanelTest extends TestCase
         Notification::fake();
         $admin = $this->usuario('admin');
         $this->actingAs($admin)->postJson('/api/admin/usuarios', [
-            'name' => 'Luis', 'email' => 'luis@dualab.es', 'role' => 'contactos', 'password' => self::CONTRASENA, 'password_confirmation' => self::CONTRASENA,
+            'name' => 'Luis', 'email' => 'luis@dualab.es', 'role' => 'editor', 'password' => self::CONTRASENA, 'password_confirmation' => self::CONTRASENA,
         ])->assertCreated();
         $luis = User::where('email', 'luis@dualab.es')->first();
 
@@ -130,7 +132,7 @@ class UsuariosPanelTest extends TestCase
         $this->assertSame('alumno', $alumno->fresh()->role);
 
         // Cambiar rol, bloquear (no puede entrar) y papelera → restaurar
-        $this->actingAs($admin)->patchJson("/api/admin/usuarios/{$editor->id}", ['role' => 'contactos'])->assertOk()->assertJsonPath('role', 'contactos');
+        $this->actingAs($admin)->patchJson("/api/admin/usuarios/{$editor->id}", ['role' => 'admin'])->assertOk()->assertJsonPath('role', 'admin');
         $this->actingAs($admin)->postJson("/api/admin/usuarios/{$editor->id}/bloquear")->assertOk()->assertJsonPath('bloqueado', true);
         auth()->forgetGuards();
         $this->withHeader('Referer', 'http://localhost:5174')
@@ -152,15 +154,18 @@ class UsuariosPanelTest extends TestCase
             'idioma' => 'es', 'valores' => ['hero' => ['titulo' => 'Centros que innovan']],
         ])->assertOk();
         $contacto = Contacto::create(['nombre' => 'Eva', 'email' => 'eva@ejemplo.com', 'tipo' => 'empresa']);
-        $this->actingAs($editor)->patchJson("/api/admin/formularios/{$contacto->id}", ['estado' => 'archivado'])->assertOk();
+        // Los formularios se atienden en DuaLab Central: queda en el registro como «Central · nombre»
+        $this->central()->patchJson("/api/integraciones/central/formularios/{$contacto->id}", ['estado' => 'archivado'])->assertOk();
 
         $this->actingAs($editor)->getJson('/api/admin/actividad/pagina/centros')->assertOk()
             ->assertJsonPath('0.usuario.nombre', $editor->name)
             ->assertJsonPath('0.descripcion', 'editó la página «Centros Educativos»');
 
         $r = $this->actingAs($admin)->getJson('/api/admin/actividad?user_id='.$editor->id)->assertOk();
-        $this->assertCount(2, $r->json('data'));
-        $this->assertSame("marcó el formulario #{$contacto->id} como archivado", $r->json('data.0.descripcion'));
+        $this->assertCount(1, $r->json('data'));
+        $central = $this->actingAs($admin)->getJson('/api/admin/actividad?seccion=formularios')->assertOk();
+        $this->assertSame("marcó el formulario #{$contacto->id} como archivado", $central->json('data.0.descripcion'));
+        $this->assertStringNotContainsString('eva@ejemplo.com', $central->getContent());
         // Sin datos personales de quien escribió el formulario
         $this->assertStringNotContainsString('eva@ejemplo.com', $r->getContent());
         $this->assertSame(0, ActividadPanel::where('descripcion', 'like', '%Eva%')->count());

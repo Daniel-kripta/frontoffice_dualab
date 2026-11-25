@@ -12,6 +12,12 @@ class SeoService
 {
     private const CAMPOS = ['meta_titulo', 'meta_descripcion', 'palabra_clave', 'imagen_og', 'canonical', 'noindex'];
 
+    // Nombres en el historial (ActividadService::cambios)
+    public const ETIQUETAS = [
+        'meta_titulo' => 'SEO · Título', 'meta_descripcion' => 'SEO · Descripción', 'palabra_clave' => 'SEO · Palabra clave',
+        'imagen_og' => 'SEO · Imagen para redes', 'canonical' => 'SEO · URL canónica', 'noindex' => 'SEO · Oculta a buscadores',
+    ];
+
     /** Reglas comunes de validación (prefijo = clave del array en el request). */
     public static function reglas(string $prefijo = 'seo'): array
     {

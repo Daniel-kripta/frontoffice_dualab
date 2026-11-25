@@ -16,12 +16,18 @@ class ActividadPanel extends Model
     public const UPDATED_AT = null;
 
     // Todo lo pone el servidor (ActividadService), nunca el cliente
-    protected $fillable = ['user_id', 'usuario_nombre', 'seccion', 'accion', 'descripcion', 'objeto_tipo', 'objeto_ref'];
+    protected $fillable = ['user_id', 'usuario_nombre', 'seccion', 'accion', 'descripcion', 'objeto_tipo', 'objeto_ref', 'detalle'];
+
+    // detalle: qué cambió, [{ campo, antes, despues }] (ActividadService::cambios)
+    protected function casts(): array
+    {
+        return ['detalle' => 'array'];
+    }
 
     public const SECCIONES = [
         'paginas' => 'Páginas', 'entradas' => 'Entradas', 'categorias' => 'Categorías', 'medios' => 'Medios',
         'apariencia' => 'Apariencia', 'idiomas' => 'Idiomas', 'seo' => 'SEO', 'analitica' => 'Analítica',
-        'formularios' => 'Formularios', 'integraciones' => 'Integraciones', 'usuarios' => 'Usuarios', 'perfil' => 'Perfil',
+        'formularios' => 'Formularios', 'correo' => 'Correo', 'integraciones' => 'Integraciones', 'usuarios' => 'Usuarios', 'perfil' => 'Perfil',
     ];
 
     public function usuario()

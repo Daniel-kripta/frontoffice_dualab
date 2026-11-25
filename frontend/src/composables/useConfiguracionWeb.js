@@ -24,6 +24,7 @@ export function cargarConfiguracionWeb() {
       }
       document.documentElement.lang = idioma.value
       ponerVerificacionSearchConsole(data.ajustes['seo.search_console'])
+      if (!window.location.pathname.startsWith('/gestion-web')) ponerOrganizacion(data.organizacion)
       if (!enVistaPrevia && !window.location.pathname.startsWith('/gestion-web')) aplicarApariencia(aparienciaDeAjustes(data.ajustes))
     })
     .catch(() => {})
@@ -37,6 +38,17 @@ function ponerVerificacionSearchConsole(codigo) {
   meta.name = 'google-site-verification'
   meta.content = codigo
   document.head.appendChild(meta)
+}
+
+// Datos de la organización (SEO → Datos de la organización) en JSON-LD para Google y las IA.
+// textContent: el navegador no lo interpreta como HTML aunque un texto lleve «</script>».
+function ponerOrganizacion(organizacion) {
+  if (!organizacion || document.getElementById('ld-organizacion')) return
+  const script = document.createElement('script')
+  script.type = 'application/ld+json'
+  script.id = 'ld-organizacion'
+  script.textContent = JSON.stringify(organizacion)
+  document.head.appendChild(script)
 }
 
 export function useConfiguracionWeb() {

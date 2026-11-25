@@ -1,8 +1,20 @@
 <!-- SEO de una página o entrada (lo que hacía la caja de All in One SEO):
-     vista previa en Google, título y descripción con contador, palabra clave con
+     semáforo, vista previa en Google, título y descripción con contador, palabra clave con
      comprobaciones, y en «Avanzado» imagen para redes, canonical y noindex. -->
 <template>
   <div class="space-y-5">
+    <!-- Semáforo (como el de Yoast): se recalcula mientras se escribe -->
+    <div class="rounded-xl border p-4" :class="semaforo.caja" role="status">
+      <p class="flex flex-wrap items-center gap-2 text-sm font-semibold text-azul-noche">
+        <span class="h-3 w-3 shrink-0 rounded-full" :class="semaforo.punto" aria-hidden="true" />
+        SEO: {{ semaforo.texto }}
+        <span class="font-normal text-texto-secundario">· {{ revisiones.filter(r => r.ok).length }} de {{ revisiones.length }} comprobaciones</span>
+      </p>
+      <ul v-if="pendientes.length" class="mt-2 space-y-1 text-sm text-gray-700">
+        <li v-for="r in pendientes" :key="r.texto" class="flex gap-2"><span aria-hidden="true">·</span><span>{{ r.texto }}</span></li>
+      </ul>
+    </div>
+
     <!-- Vista previa en Google -->
     <div>
       <p class="gw-etiqueta">Vista previa en Google</p>
@@ -111,6 +123,30 @@ const comprobaciones = computed(() => {
   if (props.slug) lista.push({ ok: enSlug, texto: 'la palabra clave aparece en la URL' })
   if (props.texto) lista.push({ ok: normalizar(props.texto).includes(k), texto: 'la palabra clave aparece en el texto' })
   return lista
+})
+
+// Semáforo: todas las comprobaciones en una nota. Rojo si está oculta o le falta lo básico.
+const revisiones = computed(() => {
+  const titulo = tituloFinal.value.length
+  const descripcion = (props.modelValue.meta_descripcion || '').length
+  const lista = [
+    { ok: !props.modelValue.noindex, basica: true, texto: 'Está oculta a los buscadores (noindex en Avanzado).' },
+    { ok: titulo >= 30 && titulo <= 60, texto: `El título SEO tiene ${titulo} caracteres: mejor entre 30 y 60.` },
+    { ok: descripcion > 0 || !!props.descripcionPorDefecto, basica: true, texto: 'Falta la meta descripción.' },
+    { ok: descripcion === 0 ? !!props.descripcionPorDefecto : descripcion >= 120 && descripcion <= 160, texto: `La meta descripción tiene ${descripcion} caracteres: mejor entre 120 y 160.` },
+    { ok: !!clave.value, texto: 'Elige una palabra clave principal para poder revisarla.' },
+    // «la palabra clave aparece en el título SEO» → «La palabra clave no aparece en el título SEO.»
+    ...(clave.value ? comprobaciones.value.map(c => ({ ok: c.ok, texto: `${c.texto.replace('la palabra clave aparece', 'La palabra clave no aparece')}.` })) : []),
+  ]
+  // Si falta la descripción, no repetir también su longitud
+  return lista.filter((r, i) => !(i === 3 && !lista[2].ok))
+})
+const pendientes = computed(() => revisiones.value.filter(r => !r.ok))
+const semaforo = computed(() => {
+  const malas = pendientes.value.length
+  if (pendientes.value.some(r => r.basica)) return { texto: 'falta trabajo', punto: 'bg-red-500', caja: 'border-red-200 bg-red-50/60' }
+  if (malas === 0) return { texto: 'bien', punto: 'bg-emerald-500', caja: 'border-emerald-200 bg-emerald-50/60' }
+  return { texto: 'mejorable', punto: 'bg-amber-500', caja: 'border-amber-200 bg-amber-50/60' }
 })
 
 // Contador con estado: corto / bien / largo (color + texto, no solo color)

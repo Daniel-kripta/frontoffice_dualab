@@ -18,10 +18,10 @@ use Illuminate\Validation\Rules\Password;
  */
 class CrearUsuarioGestionWeb extends Command
 {
-    protected $signature = 'gestion-web:usuario {email} {--rol=editor : admin | editor | contactos} {--nombre=}
+    protected $signature = 'gestion-web:usuario {email} {--rol=editor : admin | editor} {--nombre=}
                             {--cambiar-contrasena : En una cuenta existente, pide una contraseña nueva}';
 
-    protected $description = 'Crea o da acceso a una cuenta del panel de gestión web (admin, editor o contactos). Las demás cuentas, desde Usuarios en el panel';
+    protected $description = 'Crea o da acceso a una cuenta del panel de gestión web (admin o editor). Las demás cuentas, desde Usuarios en el panel';
 
     public function handle(): int
     {

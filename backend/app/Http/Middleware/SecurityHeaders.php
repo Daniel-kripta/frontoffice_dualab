@@ -12,8 +12,13 @@ class SecurityHeaders
     {
         $response = $next($request);
 
-        $response->headers->set('Content-Security-Policy', "default-src 'self'");
-        $response->headers->set('X-Frame-Options', 'DENY');
+        // Las páginas de la web pública (PaginaPublicaController) ponen las suyas: no se pisan
+        if (! $response->headers->has('Content-Security-Policy')) {
+            $response->headers->set('Content-Security-Policy', "default-src 'self'");
+        }
+        if (! $response->headers->has('X-Frame-Options')) {
+            $response->headers->set('X-Frame-Options', 'DENY');
+        }
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
