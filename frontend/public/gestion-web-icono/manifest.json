@@ -1,0 +1,17 @@
+{
+  "id": "/gestion-web",
+  "name": "Gestión web DuaLab",
+  "short_name": "Gestión web",
+  "description": "Panel de gestión de la web pública de DuaLab",
+  "lang": "es",
+  "start_url": "/gestion-web",
+  "scope": "/gestion-web",
+  "display": "standalone",
+  "theme_color": "#0E3233",
+  "background_color": "#0E3233",
+  "icons": [
+    { "src": "pwa-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "pwa-512x512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "maskable-icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

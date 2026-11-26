@@ -174,6 +174,16 @@ router.afterEach((to) => {
     iconosWeb[rel] ??= enlace.getAttribute('href')
     enlace.setAttribute('href', enPanel ? `${import.meta.env.BASE_URL}gestion-web-icono/${archivo}` : iconosWeb[rel])
   }
+  // Solo el panel se puede instalar como app (scope /gestion-web): la web pública no lleva manifest
+  let manifest = document.querySelector('link[rel="manifest"]')
+  if (enPanel && !manifest) {
+    manifest = document.createElement('link')
+    manifest.rel = 'manifest'
+    manifest.href = `${import.meta.env.BASE_URL}gestion-web-icono/manifest.json`
+    document.head.appendChild(manifest)
+  } else if (!enPanel && manifest) {
+    manifest.remove()
+  }
 })
 
 export default router

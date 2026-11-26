@@ -64,6 +64,11 @@
         </div>
       </div>
     </nav>
+
+    <!-- Instalar como app: fijo al pie, fuera del scroll del nav, para verse siempre sin desplazarse -->
+    <div class="shrink-0 px-3 pb-3">
+      <BotonInstalarApp />
+    </div>
   </aside>
 </template>
 
@@ -74,6 +79,7 @@ import { ArrowTopRightOnSquareIcon } from '@heroicons/vue/24/outline'
 import logo from '@/assets/logo_colores.png'
 import { GRUPOS_PANEL } from '../navegacion'
 import { usePanelSesion } from '@/stores/panelSesion'
+import BotonInstalarApp from './BotonInstalarApp.vue'
 
 defineProps({ abierto: { type: Boolean, default: false } })
 defineEmits(['cerrar'])
